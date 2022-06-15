@@ -1,0 +1,148 @@
+/* imports */
+@import url('https://fonts.googleapis.com/css2?family=Radio+Canada:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+/* globals */
+
+*{
+    position: relative;
+    box-sizing: border-box;
+    font-family: 'Radio Canada', sans-serif;
+}
+
+body,html{
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+b {
+    font-weight: 600;
+}
+
+/* menu */
+
+.buttons{
+    display: flex;
+}
+
+.buttons button{
+    margin-top: 5px;
+    margin-left: 5px;
+    background: white;
+    border: 2px solid rgb(200,200,200);
+    border-radius: 50px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+}
+
+.buttons button:hover{
+    background: rgb(235,235,235);
+}
+
+.buttons button:active{
+    opacity:0.7;
+}
+
+.buttons #numbers{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px 8px;
+    font-size: 1.35rem;
+}
+
+
+
+/* audio controls */
+
+.track-info-controls{
+    display: flex;
+}
+
+#analyzer{
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.track-info-controls b{
+    text-align: center;
+    display: block;
+}
+
+.audio-controls{
+    display: flex;
+}
+
+.audio-control-group{
+    border: 2px solid rgb(200,200,200);
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.audio-control-group ul{
+    padding: 0.75rem;
+
+}
+
+.audio-control-group li{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* tracks */
+
+#tracks{
+    border: 2px solid rgb(200,200,200);
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    min-height: 150px;
+}
+
+#tracks canvas{
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+#tracks canvas:active,#tracks canvas:focus{
+    cursor: pointer;
+}
+
+#cursor{
+    position: absolute;
+    z-index: 2;
+    width: 2px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: red;
+}
+#cursor::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -2px;
+    width: 6px;
+    height: 2px;
+    background: red;
+}
+#cursor::before{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: -2px;
+    width: 6px;
+    height: 2px;
+    background: red;
+}
+
+
+/* utils */
+
+.center{
+    text-align: center;
+}
