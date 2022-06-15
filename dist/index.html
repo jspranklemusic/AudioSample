@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" defer src="/src/index.js"></script>
+    <link rel="stylesheet" href="/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="buttons">
+        <div>
+            <input multiple id="fileinput" style="display: none;" type="file"/>
+            <button id="load">loadSound</button>
+        </div>
+        <div>
+            <button id="start">playSound</button>
+        </div>
+        <div>
+            <button id="stop">stopSound</button>
+        </div>
+        <div>
+            <button id="log-gain">logGain</button>
+        </div>
+        <div>
+            <button id="fadeout">fadeout</button>
+        </div>  
+        <div id="numbers">
+            00:00:00
+        </div>
+    </div>
+    <br>
+    <div>
+        <div>
+            <b>Tracks</b>
+        </div>
+        <div id="timeline">
+
+        </div>
+        <div id="tracks">
+            <span id="cursor"></span>
+        </div>
+    </div>
+    <div class="track-info-controls">
+        <div>
+            <canvas id="analyzer"></canvas>
+        </div>
+        <div class="audio-controls">
+            <div class="audio-control-group">
+                <div class="audio-control">
+                    <b>Volume</b>
+                    <div class="center" id="volume-display">0.5</div>
+                    <div>
+                        <input value="0.5" min="0" max="1" step="0.01" type="range" name="volume" id="volume">
+                    </div>
+                </div>
+                <div class="audio-control">
+                    <b>Panning (L/R)</b>
+                    <div class="center" id="panning-display">0</div>
+                    <div>
+                        <input value="0" min="-1" max="1" step="0.01" type="range" name="panning" id="panning">
+                    </div>
+                </div>
+            </div>
+            <div class="audio-control-group">
+                <b>Compressor</b>
+                <ul>
+                    <li>Threshold: <span id="threshold-display">-20</span> <br> 
+                        <input value="-20" min="-100" max="0" step="1" type="range" id="compressor-threshold">
+                    </li>
+                    <li>Ratio: <span id="ratio-display">1</span><br> 
+                        <input value="1" min="1" max="20" step="0.1" type="range" id="compressor-ratio">
+                    </li>
+                    <li>Attack: <span id="attack-display">0.5</span><br> 
+                        <input value="0.5" min="0" max="1" step="0.01" type="range" id="compressor-attack">
+                    </li>
+                    <li>Release: <span id="release-display">0.5</span><br> 
+                        <input value="0.5" min="0" max="1" step="0.01" type="range" id="compressor-release">
+                    </li>
+                    <li>Knee: <span id="knee-display">30</span><br> 
+                        <input value="30" min="0" max="40" step="1" type="range" id="compressor-knee">
+                    </li>
+                </ul>
+            </div>
+            <div class="audio-control-group">
+                <b>EQ</b>
+                <ul>
+                    <li>High Shelf: <span id="highshelf-display">0</span> <br> 
+                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-highshelf">
+                    </li>
+                    <li>High: <span id="high-display">0</span> <br> 
+                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-high">
+                    </li>
+                    <li>Mid: <span id="mid-display">0</span> <br> 
+                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-mid">
+                    </li>
+                    <li>Low: <span id="low-display">0</span> <br> 
+                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-low">
+                    </li>
+                    <li>Low Shelf: <span id="lowshelf-display">0</span> <br> 
+                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-lowshelf">
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+ 
+    
+
+</body>
+</html>
