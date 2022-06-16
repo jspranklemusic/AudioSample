@@ -6,6 +6,7 @@ class AudioPlayer{
     timelineInterval = null
     loadingQueue = []
     tracks = [{}]
+    cursorOffset = 0;
     constructor(url) {
         // const AudioContext = window.AudioContext || window.webkitAudioContext;
         const context = new AudioContext();
@@ -85,6 +86,7 @@ class AudioPlayer{
             gainNode.connect(this.rootNode);
         // save references to nodes as variables
             source.tailNode = gainNode;
+            source.headNode = highshelf;
             source.effects = {
                 gainNode,
                 stereoPanner,
@@ -153,6 +155,27 @@ class AudioPlayer{
         this.compressorNode = compressor;
         this.rootNode = compressor;
     }
+    jumpToPoint(){
+     
+        for(let i = 0; i < this.audioFiles.length; i++){
+            let file = this.audioFiles[i];
+            const data = {...file};
+            file.source.disconnect();
+            file.source = this.context.createBufferSource();
+            file.source.effects = data.source.effects;
+            file.source.headNode = data.source.headNode
+            file.source.tailNode = data.source.tailNode;
+            file.source.buffer = data.source.buffer;
+            file.source.started = false;
+            console.log(file.source)
+            file.source.connect(data.source.headNode);
+            this.audioFiles[i] = file;
+        }
+        if(this.playing){
+            this.playing = false;
+            this.play();
+        }
+    }
     // load audio if none, play audio, set appropriate visualizations
     async play(){
         if(this.playing) return;
@@ -162,17 +185,18 @@ class AudioPlayer{
         this.audioFiles.forEach(file => {
             if(!file.source.started){
                 file.source.started = true
-                file.source.start(this.context.currentTime,0);
+                console.log(this.cursorOffset)
+                file.source.start(this.context.currentTime,this.cursorPosition);
             }
         })
         globals.state.stopped = false;
         // move the cursor
-        const moveCursor = (a,b,c)=> {
+        const moveCursor = (a)=> {
             if(!globals.state.stopped){
                 requestAnimationFrame(moveCursor)
-                this.cursorPosition += globals.cursorPerAnimationFrame;
-                $("#cursor").style.transform = `translateX(${this.cursorPosition}px)`;
-                let currentTime = this.context.currentTime
+                const currentTime = this.context.currentTime + this.cursorOffset;
+                this.cursorPosition = currentTime;
+                $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
                 let content = (Math.floor(currentTime*100)/100+"").replace(".",":");
                 if(currentTime < 10){
                     content = "00:0"+content
@@ -284,6 +308,14 @@ class AudioPlayer{
         if(this.loadingQueue.length > 0){
             this.processNew();
         }
+    }
+    setCursor(e){
+        // the cursor offset should be the distance between context.currentTime and the new position;
+        let newPosition = (e.clientX - 2)/globals.pixelsPerSecond;
+        this.cursorOffset = (newPosition - this.context.currentTime);
+        this.cursorPosition = newPosition;
+        $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
+        this.jumpToPoint();
     }
 
     // make a source, give it a base analyser, compressor, eq, panning, and gain.

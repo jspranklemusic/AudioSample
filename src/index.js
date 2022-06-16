@@ -9,6 +9,7 @@ const visualizer = new Visualizer(audio);
 // track
 $("#tracks").ondragover = e => Waveform.dragPosition(e);
 $("#tracks").onmousedown = e => Waveform.mousePosition(e);
+$("#timeline").onclick = e => audio.setCursor(e);
 // menu
 $("#load").onclick = ()=> audio.loadNew();
 $('#start').onclick = () => audio.play();
