@@ -5,6 +5,7 @@ class AudioPlayer{
     cursorPosition = 0;
     timelineInterval = null
     loadingQueue = []
+    tracks = [{}]
     constructor(url) {
         // const AudioContext = window.AudioContext || window.webkitAudioContext;
         const context = new AudioContext();
@@ -16,6 +17,33 @@ class AudioPlayer{
         this.reader.addEventListener("load", e =>{
             this.onReaderComplete();
         })
+        // construct timeline marks
+        let n = 0;
+        const timeline = $("#timeline");
+        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10)){
+            const span = document.createElement("span");
+            span.style =`
+                display: block;
+                position: absolute;
+                left: ${i}px;
+                font-size: 8px;
+                height: 100%;
+                border-left: 1px solid rgb(200,200,200);
+            `
+            
+            timeline.appendChild(span);
+            if(!(n%60)){
+                span.style.fontWeight = "bold";
+                span.style.borderLeft = "2px solid black"
+                span.innerText = n/60;
+            }else{
+                span.innerText = n;
+        
+            }
+            n += 10;
+        
+        }
+
         // analyser
             this.initializeAnalyser(context,context.destination);  
         // gain
@@ -30,6 +58,46 @@ class AudioPlayer{
         if(url){
             this.url = url;
         }
+    }
+
+    buildChannelEffectsChain(source){
+        // build the nodes
+            const stereoPanner = new StereoPannerNode(this.context);
+            const gainNode = new GainNode(this.context)
+            const lowshelf = new BiquadFilterNode(this.context, { type: "lowshelf", frequency: 100 } );
+            const low = new BiquadFilterNode(this.context, { type: "peaking", frequency: 250 } );
+            const mid = new BiquadFilterNode(this.context, { type: "peaking", frequency: 1000 } );
+            const high = new BiquadFilterNode(this.context, { type: "peaking", frequency: 5000 } );
+            const highshelf = new BiquadFilterNode(this.context, { type: "highshelf", frequency: 8000 } );
+            const compressor = new DynamicsCompressorNode(this.context);
+        // defaults
+            compressor.ratio.value = 1;
+            gainNode.gain.value = 0.5;
+        // make connections
+            source.connect(highshelf);
+            highshelf.connect(high);
+            high.connect(mid);
+            mid.connect(low);
+            low.connect(lowshelf);
+            lowshelf.connect(compressor);
+            compressor.connect(stereoPanner)
+            stereoPanner.connect(gainNode);
+            gainNode.connect(this.rootNode);
+        // save references to nodes as variables
+            source.tailNode = gainNode;
+            source.effects = {
+                gainNode,
+                stereoPanner,
+                compressor,
+                filters: {
+                    lowshelf,
+                    low,
+                    mid,
+                    high,
+                    highshelf
+                }
+            }
+        return source;
     }
 
     analyse(){
@@ -87,6 +155,7 @@ class AudioPlayer{
     }
     // load audio if none, play audio, set appropriate visualizations
     async play(){
+        if(this.playing) return;
         if(!this.audioFiles.length){
             await this.loadAudio(this.url);
         }
@@ -120,35 +189,51 @@ class AudioPlayer{
             context: this.context.currentTime,
             timeline: globals.timeline.currentTime
         })
+        this.playing = true;
     }
     // suspend the audio context
     stop(){
+        if(!this.playing) return;
         globals.state.stopped = true;
         this.context.suspend();
         console.log({
             context: this.context.currentTime,
             timeline: globals.timeline.currentTime
         })
+        this.playing = false;
     }
-    setVolume(e){
+    setChannelVolume(node, e, labelSelector){
+        const value = e.target.value
+        console.log(value)
+        node.gain.value = value;
+        $(labelSelector).textContent = value;
+
+    }
+    setChannelPanning(node, e, labelSelector){
+        const value = e.target.value;
+        node.pan.value = value;
+        $(labelSelector).textContent = value;
+        
+    }
+    setMasterVolume(e){
         if(e){
             this.gainNode.gain.value = parseFloat(e.target.value);
             $("#volume-display").textContent = e.target.value;
         }
     }
-    setEQ(e,frequency){
-        if(e){
-            this.filter[frequency].gain.value = parseFloat(e.target.value);
-            $("#"+frequency+"-display").textContent = e.target.value;
-        }
-    }
-    setPanning(e){
+    setMasterPanning(e){
         if(e){
             this.stereoPanner.pan.value = parseFloat(e.target.value);
             $("#panning-display").textContent = e.target.value;
         }
     }
-    setCompressor(e,parameter){
+    setMasterEQ(e,frequency){
+        if(e){
+            this.filter[frequency].gain.value = parseFloat(e.target.value);
+            $("#"+frequency+"-display").textContent = e.target.value;
+        }
+    }
+    setMasterCompressor(e,parameter){
         if(e){
             this.compressorNode[parameter].value = parseFloat(e.target.value);
             $("#"+parameter+"-display").textContent = e.target.value;
@@ -201,11 +286,13 @@ class AudioPlayer{
         }
     }
 
+    // make a source, give it a base analyser, compressor, eq, panning, and gain.
     async loadToQueue(buffer){
         const source = this.context.createBufferSource();
         source.buffer = await this.context.decodeAudioData(buffer);
-        source.connect(this.rootNode);
-        const waveform = new Waveform(this);
+        source.player = this;
+        this.buildChannelEffectsChain(source);
+        const waveform = new Waveform(source);
         waveform.drawWaveform(source.buffer);
         this.audioFiles.push({source, waveform});
     }
@@ -213,15 +300,20 @@ class AudioPlayer{
     async loadAudio(url){
         this.url = url;
         this.source = this.context.createBufferSource();
-        this.source.connect(this.rootNode);
+        this.source.player = this;
+        this.buildChannelEffectsChain(this.source);
         this.audioBuffer = await fetch(url)
-        .then(res => res.arrayBuffer())
-        .then(ArrayBuffer => this.context.decodeAudioData(ArrayBuffer));
+            .then(res => res.arrayBuffer())
+            .then(ArrayBuffer => this.context.decodeAudioData(ArrayBuffer));
         this.source.buffer = this.audioBuffer;
-        const waveform = new Waveform(this);
+        const waveform = new Waveform(this.source);
         waveform.drawWaveform(this.source.buffer);
         this.audioFiles.push({source: this.source, waveform});
     }
 }
 
 export default AudioPlayer;
+
+/*
+    all audio nodes will now contain a reference to this audioplayer object
+*/

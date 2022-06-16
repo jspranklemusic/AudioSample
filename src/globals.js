@@ -1,13 +1,13 @@
 export function $(selector){
     return document.querySelector(selector);
 }
+export function $$(selector){
+    return document.querySelectorAll(selector);
+}
 export const allowedAudioFileTypes = ["audio/mpeg","audio/ogg"];
+
 export const globals = {
     tracks: {
-        dragStartY: null,
-        dragStartX: null,
-        dragCurrentY: null,
-        dragCurrentX: null,
         currentDragged: [],
     },
     state: {
@@ -19,5 +19,5 @@ export const globals = {
     },
     pixelsPerSecond: 2.99684239303,
     cursorPerAnimationFrame: 1/20.0210728931,
-    
 }
+

@@ -1,6 +1,11 @@
 /* imports */
 @import url('https://fonts.googleapis.com/css2?family=Radio+Canada:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');/* globals */
 
+:root{
+    --range-filled: rgb(180,0,0);
+    --range-empty: rgb(220,210,210);
+}
+
 *{
     position: relative;
     box-sizing: border-box;
@@ -53,6 +58,11 @@ b {
 
 /* audio controls */
 
+.track-info-controls-description{
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
 .track-info-controls{
     display: flex;
 }
@@ -77,6 +87,45 @@ b {
     border-radius: 5px;
     margin: 5px;
     padding: 5px;
+}
+
+
+
+/* channel */
+
+
+.track-name{
+    font-size: 1rem !important;
+    margin: 4px 0;
+    width: 100%;
+    overflow-x: scroll;
+}
+
+.audio-control-group.channel{
+    position: absolute;
+    width: 120px;
+    right: 0;
+    top: 0;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    border-left: 2px solid rgb(200,200,200);
+    background: rgb(235,235,235);
+}
+
+.audio-control-group input[type="range"]{
+    width: 100%;
+}
+
+
+.audio-control-group.channel > *{
+    font-size: 0.7rem;   
+}
+
+.audio-control-group.channel b{
+    text-align: center;
+    display: block;
 }
 
 .audio-control-group ul{
@@ -133,11 +182,11 @@ b {
     width: 100%;
     padding: 0;
     margin: 0;
-    min-height: 150px;
 }
 
 #tracks .track{
     border-bottom: 2px dotted black;
+    min-height: 152px;
 }
 
 #tracks .track:first-of-type{
@@ -165,3 +214,92 @@ b {
 .center{
     text-align: center;
 }
+
+/* custom range input */
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 5px;
+    background-image: linear-gradient(90deg,
+         var(--range-filled) 0%, 
+         var(--range-filled) 50%, 
+         var(--range-empty) 50%,
+        var(--range-empty) 100%
+    );
+    margin-top: 7px;
+  }
+  
+  /* Input Thumb */
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    border: none;
+    background: rgb(235, 235, 235);
+    cursor: ew-resize;
+    box-shadow: 0 0 3px 1px black;
+    transition: 0.2s;
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    -webkit-appearance: none;
+    height: 15px;
+    width: 15px;
+    border: none;
+    border-radius: 50%;
+    background: rgb(235, 235, 235);
+    cursor: ew-resize;
+    box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.614);
+    transition: 0.2s;
+  }
+  
+  input[type="range"]::-ms-thumb {
+    -webkit-appearance: none;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    border: none;
+    background: rgb(235, 235, 235);
+    cursor: ew-resize;
+    box-shadow: 0 0 3px 1px black;
+    transition: 0.2s;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.5);
+  }
+  
+  input[type="range"]::-moz-range-thumb:active {
+     transform: scale(1.5);
+  }
+  
+  input[type="range"]::-ms-thumb:active {
+     transform: scale(1.5);
+  }
+  
+  /* Input Track */
+  input[type=range]::-webkit-slider-runnable-track  {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+  
+  input[type=range]::-moz-range-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+  
+  input[type="range"]::-ms-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+  
