@@ -9,7 +9,7 @@
     box-sizing: border-box;
     font-family: 'Radio Canada', sans-serif;
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 body,html{
@@ -339,13 +339,11 @@ input[type="range"] {
     min-width: 30px;
     margin-top: 6px;
 }
-
 .mute-solo-container{
     display: flex;
     justify-content: space-evenly;
     align-items: center;
 }
-
 .record-enable::after{
     content: "";
     width: 60%;
@@ -355,8 +353,7 @@ input[type="range"] {
     top: 50%;
     left: 50%;
 }
-
-.btn-checkbox{
+.btn-checkbox,.mute-btn{
     display: flex;
     background: white;
     width: 2rem;
@@ -364,20 +361,43 @@ input[type="range"] {
     font-weight: bold;
     justify-content: center;
     align-items: center;
+    font-size: 1.2rem;
     border-radius: 3px;
     cursor: pointer;
     border: 2px solid rgb(200,200,200);
 }
+.mute-btn[muted="true"]{
+    background: rgba(160,160,160,0.7);
+    border: 2px solid rgba(160,160,160,0.7);
+}
 
-.btn-checkbox:hover{
+.btn-checkbox:hover,.mute-btn:hover{
     opacity: 0.7;
     box-shadow: 0px 0px 3px 1px rgba(128, 128, 128, 0.7);
 }
 
-.btn-checkbox:active{
+.btn-checkbox:active,.mute-btn:active{
     opacity: 0.5;
 }
-
-input[type="checkbox"]:checked ~ .btn-checkbox{
-
+.mute-btn{
+    cursor: pointer;
+    padding: 2px;
+}
+input[type="checkbox"]:checked + label > .btn-checkbox{
+    background: blue; 
+    color: white;
+    border: currentColor;
+}
+input[type="checkbox"]:checked + label > .btn-checkbox.mute{
+    background: rgb(231, 208, 0);
+}
+input[type="checkbox"]:checked + label > .btn-checkbox.solo{
+    background: rgb(231, 208, 0);
+    color: black;
+}
+input[type="checkbox"]:checked + label > .btn-checkbox.record-enable{
+    background: var(--range-filled);
+}
+input[type="checkbox"]:checked + label > .btn-checkbox.record-enable::after{
+    background: rgb(255, 63, 63);
 }

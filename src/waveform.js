@@ -94,17 +94,30 @@ class Waveform{
         track.appendChild(wrapper)
         console.log($("#panning-"+this.id))
         $("#panning-"+this.id).oninput = e => {player.setChannelPanning(
-            audioNode.effects.stereoPanner,
-            e,
-            "#panning-display-"+this.id
-        );
-        changeRangeBg(e)};
+                audioNode.effects.stereoPanner,
+                e,
+                "#panning-display-"+this.id
+            );
+            changeRangeBg(e)
+        };
         $("#volume-"+this.id).oninput = e => {player.setChannelVolume(
-            audioNode.effects.gainNode,
-            e,
-            "#volume-display-"+this.id
-        );
-        changeRangeBg(e)};
+                audioNode.effects.gainNode,
+                e,
+                "#volume-display-"+this.id
+            );
+            changeRangeBg(e)
+        };
+        const muteBtn =  $("#mute-btn-"+this.id);
+        muteBtn.onclick = () => {
+            if(!muteBtn.getAttribute("muted")){
+                muteBtn.setAttribute("muted","true");
+                muteBtn.src = "/icons/volume-x.svg"
+            }else{
+                muteBtn.removeAttribute("muted")
+                muteBtn.src = "/icons/volume-2.svg"
+            }
+        }
+ 
     }
     // make a waveform graphic in canvas
     drawWaveform(buffer){
