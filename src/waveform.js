@@ -15,7 +15,7 @@ class Waveform{
     static objects = []
 
     // This runs when a new clip is created
-    constructor(audioNode,container="#tracks",canvasWidth = 1050,canvasHeight = 150){
+    constructor(audioNode,container="#tracks",canvasWidth = 1050,canvasHeight = 100){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
@@ -28,11 +28,16 @@ class Waveform{
         this.canvas = canvas;
         this.canvasCtx = canvas.getContext("2d");
         this.audioNode = audioNode;
+        this.name = audioNode.name ? audioNode.name : "Track "+this.id;
         const player = this.audioNode.player;
-        // set parent
-        const parent = document.createElement("div");
-        parent.classList.add("track");
-        parent.classList.id = "track-"+this.id;
+        const wrapper = document.createElement("div");
+        wrapper.appendChild(canvas);
+        wrapper.classList.add("track-wrapper");
+        wrapper.setAttribute("data-name",this.name);
+        // set track
+        const track = document.createElement("div");
+        track.classList.add("track");
+        track.classList.id = "track-"+this.id;
         // change the places where this is referenced, namely the select option
         const option = document.createElement("option");
         option.innerHTML = `Track ${this.id}`
@@ -42,7 +47,7 @@ class Waveform{
         $("#track-select").value = option.value;
     
         // show an empty image and drag all selected clips
-        canvas.addEventListener("dragstart", e => {
+        wrapper.addEventListener("dragstart", e => {
             var img = new Image();
             img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
             e.dataTransfer.setDragImage(img, 0, 0);
@@ -52,7 +57,7 @@ class Waveform{
             return false;
         })
         // cleanup after dragging is finished
-        canvas.addEventListener("dragend", e => {
+        wrapper.addEventListener("dragend", e => {
             globals.tracks.currentDragged.forEach(item => {
                 item.dragStartY = null
                 item.dragStartX = null
@@ -80,13 +85,13 @@ class Waveform{
                 }
             }
         })
-        $(container).appendChild(parent);
+        $(container).appendChild(track);
         // okay, this is where react would be nice. I will have to assign the events after the html renders
         // render track controls and assign listeners
-        parent.innerHTML = trackControls({
+        track.innerHTML = trackControls({
             id: this.id,
         });
-        parent.appendChild(canvas)
+        track.appendChild(wrapper)
         console.log($("#panning-"+this.id))
         $("#panning-"+this.id).oninput = e => {player.setChannelPanning(
             audioNode.effects.stereoPanner,
@@ -107,7 +112,7 @@ class Waveform{
         var sampleRate = 48000
         var pixelDensity = 3;
         this.canvas.width = Math.floor(buffer.length/(sampleRate/pixelDensity));
-        this.canvasCtx.fillStyle = 'rgb(235, 235, 235)';
+        this.canvasCtx.fillStyle = 'rgb(235, 215, 215)';
         this.canvasCtx.fillRect(0,0,this.canvas.width,this.canvas.height);
         this.canvasCtx.fillStyle = 'rgb(150, 0, 0)';
         for(var i = 0; i < buffer.length; i += sampleRate/10){
@@ -145,11 +150,12 @@ class Waveform{
             const diffX = item.dragCurrentX - item.dragStartX;
 
             item.positionX = diffX + item.prevPositionX ;
-            item.canvas.style.transform = `translateX(${item.positionX}px)`;
+            // item.canvas.style.transform = `translateX(${item.positionX}px)`;
+            item.canvas.parentElement.style.transform = `translateX(${item.positionX}px)`;
         })
     }
     deleteClip(){
-        this.canvas.remove();
+        this.canvas.parentElement.remove();
         this.audioNode.tailNode.disconnect();
         if($("#track-select").value == this.id){
             $("#track-select").value = $("#track-select").options[$("#track-select").options.length - 2].value;

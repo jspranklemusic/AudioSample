@@ -16,6 +16,7 @@ class AudioPlayer{
         this.reader = new FileReader();
         this.audioFiles = [];
         this.reader.addEventListener("load", e =>{
+            console.log(e);
             this.onReaderComplete();
         })
         // construct timeline marks
@@ -27,18 +28,21 @@ class AudioPlayer{
                 display: block;
                 position: absolute;
                 left: ${i}px;
-                font-size: 8px;
+                font-size: 10px;
                 height: 100%;
+                padding-left: 2px;
+                margin-left: -2px;
                 border-left: 1px solid rgb(200,200,200);
+                user-select: none;
             `
             
             timeline.appendChild(span);
             if(!(n%60)){
                 span.style.fontWeight = "bold";
                 span.style.borderLeft = "2px solid black"
-                span.innerText = n/60;
+                span.innerText = n/60+"m";
             }else{
-                span.innerText = n;
+                span.innerText = n%60+"s";
         
             }
             n += 10;
@@ -295,10 +299,12 @@ class AudioPlayer{
             this.loadingQueue = [...e.target.files]
         }
         const file = this.loadingQueue[0]
+        console.log(file)
         if(!allowedAudioFileTypes.includes(file.type)){
             throw new Error("Must be a valid audio file.");
         }else{
             this.loadingQueue.shift();
+            this.nextFileName = file.name;
             this.reader.readAsArrayBuffer(file);
         }
     }
@@ -321,6 +327,7 @@ class AudioPlayer{
     // make a source, give it a base analyser, compressor, eq, panning, and gain.
     async loadToQueue(buffer){
         const source = this.context.createBufferSource();
+        source.name = this.nextFileName || "";
         source.buffer = await this.context.decodeAudioData(buffer);
         source.player = this;
         this.buildChannelEffectsChain(source);
