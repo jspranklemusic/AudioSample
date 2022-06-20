@@ -3,8 +3,6 @@ import { $ } from "./globals.js";
 
 class EventManager {
     constructor(audio){
-        // track
-        $("#tracks").ondragover = e => Waveform.dragPosition(e);
         $("#tracks").onmousedown = e => audio.setCursor(e,"tracks");
         $("#timeline").onmousedown = e => audio.setCursor(e);
         // menu

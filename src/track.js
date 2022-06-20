@@ -1,7 +1,8 @@
 import trackControls from "./components/track-controls.js";
 import popover from "./components/popover.js";
-import { $, $$ } from "./globals.js";
+import { $, $$, globals } from "./globals.js";
 import { changeRangeBg } from "./components/range.js";
+import Waveform from "./waveform.js";
 
 export const trackTypes = {
     mono: "mono",
@@ -30,7 +31,7 @@ class Track {
         Track.objects.push(this);
         const track = document.createElement("div");
         track.classList.add("track");
-        track.classList.id = "track-"+this.id;
+        track.id = "track-"+this.id;
         $(container).appendChild(track);
         // okay, this is where react would be nice. I will have to assign the events after the html renders
          track.innerHTML = trackControls({
@@ -42,8 +43,13 @@ class Track {
     addClip(clip){
         this.clips.push(clip);
         this.element.appendChild(clip.element);
+        clip.positionY = 0;
         clip.track = this;
+        clip.canvas.parentElement.style.left = "0px"
+        clip.canvas.parentElement.style.transform = `translateX(${clip.positionX}px) translateY(${clip.positionY}px)`;
         clip.audioNode.connect(this.headNode);
+        console.log(clip,this)
+
     }
     removeClip(clip){
         const index = this.clips.findIndex(object=>object.id == clip.id);
@@ -51,12 +57,31 @@ class Track {
         clip.track = null;
     }
     deleteTrack(){
+        console.log("deleting...",this)
         this.clips.forEach(clip => {
             clip.deleteClip();
             this.element.remove();
         })
     }
     setListeners(){
+        this.element.ondragover = e => Waveform.dragPosition(e);
+        this.element.ondrop = e => {
+            e.preventDefault();
+            globals.tracks.currentDragged.forEach(item => {
+                if(globals.tracks.currentDragged.length == 1 && e.target.classList.contains("track")){
+                    item.track.removeClip(item);
+                    this.addClip(item);
+                }
+                item.dragStartY = null
+                item.dragStartX = null
+                item.dragCurrentY = null
+                item.dragCurrentX = null
+                item.prevPositionX = item.positionX;
+                item.positionY = 0;
+            })
+            globals.tracks.currentDragged = [];
+            $("#tracks").click();
+        }
         // control panning and volume
         $("#panning-"+this.id).oninput = e => {this.audioPlayer.setChannelPanning(
                 this.effects.stereoPanner,

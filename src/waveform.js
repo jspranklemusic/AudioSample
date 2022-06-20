@@ -2,6 +2,8 @@ import { $, $$, globals } from './globals.js'
 class Waveform{
     positionX = 0;
     prevPositionX = 0;
+    positionY = 0;
+    prevPositionY = 0;
     id = 0;
     selected = false;
     dragStartY = null;
@@ -16,7 +18,7 @@ class Waveform{
     static objects = []
 
     // This runs when a new clip is created
-    constructor(audioNode,canvasWidth = 1050,canvasHeight = 100){
+    constructor(audioNode,canvasWidth = 1050,canvasHeight = 99){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
@@ -53,18 +55,6 @@ class Waveform{
                 globals.tracks.currentDragged.push(object)
             })
             return false;
-        })
-        // cleanup after dragging is finished
-        wrapper.addEventListener("dragend", e => {
-            globals.tracks.currentDragged.forEach(item => {
-                item.dragStartY = null
-                item.dragStartX = null
-                item.dragCurrentY = null
-                item.dragCurrentX = null
-                item.prevPositionX = item.positionX;
-            })
-            globals.tracks.currentDragged = [];
-            $("#tracks").click();
         })
         // select/unselected multiple if shift, otherwise only select one
         canvas.addEventListener("mousedown", e => {
@@ -125,7 +115,14 @@ class Waveform{
     }
     // drag tracks along timeline
     static dragPosition(e){
-        globals.tracks.currentDragged.forEach(item => {
+        e.preventDefault();
+        const tracksOffset = $("#timeline").getBoundingClientRect().bottom
+        globals.tracks.currentDragged.forEach((item)=> {
+            if(globals.tracks.currentDragged.length == 1){
+               if(e.target.classList.contains("track")){
+                item.positionY = e.target.getBoundingClientRect().top - (tracksOffset + 2 ) - item.track.element.offsetTop
+               }
+            }
             if(item.dragStartX === null | item.dragStartY === null){
                 item.dragStartX = e.clientX;
                 item.dragStartY = e.clientY;
@@ -136,7 +133,8 @@ class Waveform{
 
             item.positionX = diffX + item.prevPositionX ;
             // item.canvas.style.transform = `translateX(${item.positionX}px)`;
-            item.canvas.parentElement.style.transform = `translateX(${item.positionX}px)`;
+            item.canvas.parentElement.style.transform = `translateX(${item.positionX}px) translateY(${item.positionY}px)`;
+            
         })
     }
     deleteClip(){
