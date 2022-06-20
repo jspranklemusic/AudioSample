@@ -13,6 +13,7 @@ const trackControls = (args = { id: 0, setChannelVolume:()=>{}, setChannelPannin
             <label for="record-enable-${args.id}">
                 <span class="btn-checkbox record-enable"></span>
             </label>
+            <img class="mute-btn" id="delete-track-${args.id}" src="/icons/trash-2.svg"/>
         </div>
         <div class="gain-pan-container">
             <div class="audio-control">

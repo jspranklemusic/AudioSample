@@ -1,11 +1,13 @@
 import { $, allowedAudioFileTypes, globals } from './globals.js'
 import Waveform from './waveform.js';
+import Track, { trackTypes } from './track.js';
 
 class AudioPlayer{
+    tracks = [];
     cursorPosition = 0;
     timelineInterval = null
     loadingQueue = []
-    tracks = [{}]
+    tracks = []
     cursorOffset = 0;
     constructor(url) {
         // const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -20,34 +22,10 @@ class AudioPlayer{
             this.onReaderComplete();
         })
         // construct timeline marks
-        let n = 0;
-        const timeline = $("#timeline");
-        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10)){
-            const span = document.createElement("span");
-            span.style =`
-                display: block;
-                position: absolute;
-                left: ${i}px;
-                font-size: 10px;
-                height: 100%;
-                padding-left: 2px;
-                margin-left: -2px;
-                border-left: 1px solid rgb(200,200,200);
-                user-select: none;
-            `
-            
-            timeline.appendChild(span);
-            if(!(n%60)){
-                span.style.fontWeight = "bold";
-                span.style.borderLeft = "2px solid black"
-                span.innerText = n/60+"m";
-            }else{
-                span.innerText = n%60+"s";
-        
-            }
-            n += 10;
-        
-        }
+       this.drawTimeline();
+       document.addEventListener("resize", ()=>{
+        this.drawTimeline();
+       })
 
         // analyser
             this.initializeAnalyser(context,context.destination);  
@@ -63,47 +41,6 @@ class AudioPlayer{
         if(url){
             this.url = url;
         }
-    }
-
-    buildChannelEffectsChain(source){
-        // build the nodes
-            const stereoPanner = new StereoPannerNode(this.context);
-            const gainNode = new GainNode(this.context)
-            const lowshelf = new BiquadFilterNode(this.context, { type: "lowshelf", frequency: 100 } );
-            const low = new BiquadFilterNode(this.context, { type: "peaking", frequency: 250 } );
-            const mid = new BiquadFilterNode(this.context, { type: "peaking", frequency: 1000 } );
-            const high = new BiquadFilterNode(this.context, { type: "peaking", frequency: 5000 } );
-            const highshelf = new BiquadFilterNode(this.context, { type: "highshelf", frequency: 8000 } );
-            const compressor = new DynamicsCompressorNode(this.context);
-        // defaults
-            compressor.ratio.value = 1;
-            gainNode.gain.value = 0.5;
-        // make connections
-            source.connect(highshelf);
-            highshelf.connect(high);
-            high.connect(mid);
-            mid.connect(low);
-            low.connect(lowshelf);
-            lowshelf.connect(compressor);
-            compressor.connect(stereoPanner)
-            stereoPanner.connect(gainNode);
-            gainNode.connect(this.rootNode);
-        // save references to nodes as variables
-            source.tailNode = gainNode;
-            source.headNode = highshelf;
-            source.effects = {
-                gainNode,
-                stereoPanner,
-                compressor,
-                filters: {
-                    lowshelf,
-                    low,
-                    mid,
-                    high,
-                    highshelf
-                }
-            }
-        return source;
     }
 
     analyse(){
@@ -160,20 +97,18 @@ class AudioPlayer{
         this.rootNode = compressor;
     }
     jumpToPoint(){
-     
         for(let i = 0; i < this.audioFiles.length; i++){
-            let file = this.audioFiles[i];
-            const data = {...file};
-            file.source.disconnect();
-            file.source = this.context.createBufferSource();
-            file.source.effects = data.source.effects;
-            file.source.headNode = data.source.headNode
-            file.source.tailNode = data.source.tailNode;
-            file.source.buffer = data.source.buffer;
-            file.source.started = false;
-            console.log(file.source)
-            file.source.connect(data.source.headNode);
-            this.audioFiles[i] = file;
+            let waveform = this.audioFiles[i];
+            if(waveform.track){
+                const data = {...waveform};
+                waveform.audioNode.disconnect();
+                waveform.audioNode = this.context.createBufferSource();
+                waveform.track = data.track;
+                waveform.audioNode.buffer = data.audioNode.buffer;
+                waveform.audioNode.started = false;
+                waveform.audioNode.connect(waveform.track.headNode);
+                this.audioFiles[i] = waveform;
+            }
         }
         if(this.playing){
             this.playing = false;
@@ -187,10 +122,9 @@ class AudioPlayer{
             await this.loadAudio(this.url);
         }
         this.audioFiles.forEach(file => {
-            if(!file.source.started){
-                file.source.started = true
-                console.log(this.cursorOffset)
-                file.source.start(this.context.currentTime,this.cursorPosition);
+            if(!file.audioNode.started){
+                file.audioNode.started = true
+                file.audioNode.start(this.context.currentTime,this.cursorPosition);
             }
         })
         globals.state.stopped = false;
@@ -315,11 +249,14 @@ class AudioPlayer{
             this.processNew();
         }
     }
-    setCursor(e){
+    setCursor(e,origin){
         // the cursor offset should be the distance between context.currentTime and the new position;
+        if(origin == "tracks" && (!e.target.classList.contains("track") && e.target.id != "tracks")){
+            return;
+        }
         let newPosition = (e.clientX - 2)/globals.pixelsPerSecond;
         this.cursorOffset = (newPosition - this.context.currentTime);
-        this.cursorPosition = newPosition;
+        this.cursorPosition = newPosition < 0 ? 0 : newPosition;
         $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
         this.jumpToPoint();
     }
@@ -330,24 +267,62 @@ class AudioPlayer{
         source.name = this.nextFileName || "";
         source.buffer = await this.context.decodeAudioData(buffer);
         source.player = this;
-        this.buildChannelEffectsChain(source);
+        source.startTime = 0;
+        const track = new Track(trackTypes.stereo, this);
         const waveform = new Waveform(source);
         waveform.drawWaveform(source.buffer);
-        this.audioFiles.push({source, waveform});
+        track.addClip(waveform);
+        this.audioFiles.push(waveform);
+        this.tracks.push(track);
+
     }
 
     async loadAudio(url){
         this.url = url;
         this.source = this.context.createBufferSource();
         this.source.player = this;
-        this.buildChannelEffectsChain(this.source);
+        this.source.name = this.nextFileName || "";
         this.audioBuffer = await fetch(url)
             .then(res => res.arrayBuffer())
             .then(ArrayBuffer => this.context.decodeAudioData(ArrayBuffer));
         this.source.buffer = this.audioBuffer;
+        const track = new Track(trackTypes.stereo, this);
         const waveform = new Waveform(this.source);
         waveform.drawWaveform(this.source.buffer);
-        this.audioFiles.push({source: this.source, waveform});
+        track.addClip(waveform);
+        this.audioFiles.push(waveform);
+        this.tracks.push(track);
+    }
+    drawTimeline(){
+        let n = 0;
+        const timeline = $("#timeline");
+        timeline.innerHTML = "";
+        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10)){
+            const span = document.createElement("span");
+            span.style =`
+                display: block;
+                position: absolute;
+                left: ${i}px;
+                font-size: 10px;
+                height: 100%;
+                padding-left: 2px;
+                margin-left: -2px;
+                border-left: 1px solid rgb(200,200,200);
+                user-select: none;
+            `
+            
+            timeline.appendChild(span);
+            if(!(n%60)){
+                span.style.fontWeight = "bold";
+                span.style.borderLeft = "2px solid black"
+                span.innerText = n/60+"m";
+            }else{
+                span.innerText = n%60+"s";
+        
+            }
+            n += 10;
+        
+        }
     }
 }
 

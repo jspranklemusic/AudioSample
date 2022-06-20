@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&family=Radio+Canada:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');:root{
     --range-filled: rgb(200, 0, 0);
     --range-empty: rgb(220,210,210);
+    --above-all: 1000
 }
 
 *{
@@ -20,7 +21,11 @@ body,html{
 
 b {
     font-weight: 700;
+}
 
+b[contenteditable="true"]{
+    background: white;
+    color: blue;
 }
 
 /* menu */
@@ -29,7 +34,7 @@ b {
     display: flex;
 }
 
-.buttons button{
+.buttons button,.button{
     margin-top: 5px;
     margin-left: 5px;
     background: white;
@@ -39,11 +44,11 @@ b {
     cursor: pointer;
 }
 
-.buttons button:hover{
+.buttons button:hover,.button:hover{
     background: rgb(235,235,235);
 }
 
-.buttons button:active{
+.buttons button:active,.button:active{
     opacity:0.7;
 }
 
@@ -115,6 +120,7 @@ b {
     padding: 0rem 0.5rem;
     border-left: 2px solid rgb(200,200,200);
     background: rgb(235,235,235);
+    cursor: auto;
 }
 
 .audio-control-group input[type="range"]{
@@ -155,8 +161,8 @@ b {
     position: absolute;
     z-index: 2;
     width: 2px;
-    height: 100%;
-    top: 0;
+    height: calc(100% + 22px);
+    bottom: 0;
     left: -1px;
     background: rgb(80, 153, 255);
 }
@@ -186,7 +192,8 @@ b {
     width: 100%;
     padding: 0;
     margin: 0;
-    min-height: 108px;}
+    cursor: crosshair;
+}
 
 #tracks .track{
     border-bottom: 2px dotted black;
@@ -329,6 +336,36 @@ input[type="range"] {
     background: transparent;
   }
 
+/* popover-container */
+
+#popover-root{
+    width: 0px;
+    height: 0px;
+}
+
+.popover-container{
+    position: fixed;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: var(--above-all);
+    min-width: 200px;
+    text-align: center;
+    box-shadow: 3px 3px 8px rgba(0,0,0,.25);
+    padding: 0.5rem 1rem;
+}
+
+.popover-container h2{  
+    margin: 0.5rem;
+    padding: 0;
+}
+
+.popover-container p{
+    margin: 0;
+    padding: 0;
+}
+
 /* button checkbox */
 
 .gain-pan-container .audio-control{
@@ -396,8 +433,58 @@ input[type="checkbox"]:checked + label > .btn-checkbox.solo{
     color: black;
 }
 input[type="checkbox"]:checked + label > .btn-checkbox.record-enable{
-    background: var(--range-filled);
+    animation: record-enable-blink 1s infinite;
 }
 input[type="checkbox"]:checked + label > .btn-checkbox.record-enable::after{
     background: rgb(255, 63, 63);
+}
+
+/* animation classes */
+
+.fadeout { 
+    animation: fadeout 0.5s forwards;
+}
+
+.fadein {
+    animation: fadein 0.5s backwards;
+}
+
+@keyframes fadein {
+    0%{
+        opacity: 0;
+        transform: translateY(2rem);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeout {
+    0%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100%{
+        opacity: 0;
+        transform: translateY(2rem);
+    }
+}
+
+@keyframes record-enable-blink{
+    0%{
+        background: var(--range-empty);
+    }
+    50%{
+        background: var(--range-empty);
+    }
+    50%{
+        background: var(--range-filled);
+    }
+    100%{
+        background: var(--range-filled);
+    }
+    100%{
+        background: var(--range-empty);
+    }
 }

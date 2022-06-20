@@ -1,6 +1,4 @@
-import { $, globals } from './globals.js'
-import trackControls from './components/track-controls.js';
-import { changeRangeBg } from './components/range.js';
+import { $, $$, globals } from './globals.js'
 class Waveform{
     positionX = 0;
     prevPositionX = 0;
@@ -11,11 +9,14 @@ class Waveform{
     dragCurrentY = null;
     dragCurrentX = null;
     name = "";
+    startTime = 0;
+    duration = 0;
+    track = null;
     static count = 0;
     static objects = []
 
     // This runs when a new clip is created
-    constructor(audioNode,container="#tracks",canvasWidth = 1050,canvasHeight = 100){
+    constructor(audioNode,canvasWidth = 1050,canvasHeight = 100){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
@@ -29,15 +30,12 @@ class Waveform{
         this.canvasCtx = canvas.getContext("2d");
         this.audioNode = audioNode;
         this.name = audioNode.name ? audioNode.name : "Track "+this.id;
-        const player = this.audioNode.player;
+        this.player = this.audioNode.player;
         const wrapper = document.createElement("div");
         wrapper.appendChild(canvas);
         wrapper.classList.add("track-wrapper");
         wrapper.setAttribute("data-name",this.name);
-        // set track
-        const track = document.createElement("div");
-        track.classList.add("track");
-        track.classList.id = "track-"+this.id;
+
         // change the places where this is referenced, namely the select option
         const option = document.createElement("option");
         option.innerHTML = `Track ${this.id}`
@@ -85,40 +83,14 @@ class Waveform{
                 }
             }
         })
-        $(container).appendChild(track);
-        // okay, this is where react would be nice. I will have to assign the events after the html renders
-        // render track controls and assign listeners
-        track.innerHTML = trackControls({
-            id: this.id,
-        });
-        track.appendChild(wrapper)
-        console.log($("#panning-"+this.id))
-        $("#panning-"+this.id).oninput = e => {player.setChannelPanning(
-                audioNode.effects.stereoPanner,
-                e,
-                "#panning-display-"+this.id
-            );
-            changeRangeBg(e)
-        };
-        $("#volume-"+this.id).oninput = e => {player.setChannelVolume(
-                audioNode.effects.gainNode,
-                e,
-                "#volume-display-"+this.id
-            );
-            changeRangeBg(e)
-        };
-        const muteBtn =  $("#mute-btn-"+this.id);
-        muteBtn.onclick = () => {
-            if(!muteBtn.getAttribute("muted")){
-                muteBtn.setAttribute("muted","true");
-                muteBtn.src = "/icons/volume-x.svg"
-            }else{
-                muteBtn.removeAttribute("muted")
-                muteBtn.src = "/icons/volume-2.svg"
-            }
-        }
- 
+        this.element = wrapper;
     }
+
+    setName(text){
+        this.name = text;
+        this.canvas.parentElement.setAttribute("data-name",this.name);
+    }
+
     // make a waveform graphic in canvas
     drawWaveform(buffer){
         const bufferL = buffer.getChannelData(0);
@@ -169,21 +141,14 @@ class Waveform{
     }
     deleteClip(){
         this.canvas.parentElement.remove();
-        this.audioNode.tailNode.disconnect();
+        this.audioNode.disconnect(this.track.headNode);
         if($("#track-select").value == this.id){
             $("#track-select").value = $("#track-select").options[$("#track-select").options.length - 2].value;
         }
         this.option.remove();
-    }
-    static mousePosition(e){
-        // globals.tracks.dragStartX = e.clientX;
-        // globals.tracks.dragStartY = e.clientY;
-    }
-    static unsetMousePosition(){
-        // globals.tracks.dragStartX = null;
-        // globals.tracks.dragStartY = null;
-    }
+        this.track.removeClip(this);
 
+    }
 }
 
 // global mouseup to remove '.selected' class from track
@@ -191,6 +156,12 @@ document.addEventListener("mouseup", e => {
     if(!e.target.classList.contains("audio-file")){
         Waveform.findSelected().forEach(object => {
             object.unselect();
+        })
+    }
+    // if you click on track name that's editable, it should do nothing
+    if(!e.target.classList.contains("track-name")){
+        $$(".track-name").forEach(track=> {
+            track.removeAttribute("contenteditable");
         })
     }
 })
@@ -207,3 +178,7 @@ BEHAVIOR OF CLICKING:
 
 Also, I should distinguish between clips and tracks. 
 */
+
+// ok, here's the problem with mute. the mute button is muting the correct object.
+
+// also, the waveform is too dependent on track.

@@ -17,7 +17,10 @@ export const globals = {
         currentTime: 0,
         grid: false
     },
+    channelControl: {  
+        width: 140
+    },
     pixelsPerSecond: 2.99684239303,
-    cursorPerAnimationFrame: 1/20.0210728931,
+    cursorPerAnimationFrame: 1/20.0210728931
 }
 
