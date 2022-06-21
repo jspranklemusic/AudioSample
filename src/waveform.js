@@ -93,12 +93,22 @@ class Waveform{
         let one = Date.now()
         this.canvasCtx.beginPath();       
 
-        for(var i = 0; i < buffer.length; i += sampleRate/15){
-                let val = bufferL[i];
-                this.canvasCtx.lineTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
-                this.canvasCtx.moveTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
-                this.canvasCtx.stroke();
+        var i = 0;
+        while(i < buffer.length){
+            let num1 = i/(sampleRate/pixelDensity);
+            let num2 = this.canvas.height/2 + bufferL[i]*100;
+            this.canvasCtx.lineTo(num1,num2)
+            this.canvasCtx.moveTo(num1,num2)
+            this.canvasCtx.stroke();
+            i += sampleRate/15;
         }
+
+        // for(var i = 0; i < buffer.length; i += sampleRate/15){
+        //         let val = bufferL[i];
+        //         this.canvasCtx.lineTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
+        //         this.canvasCtx.moveTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
+        //         this.canvasCtx.stroke();
+        // }
         let two = Date.now();
         console.log(two - one)
 
