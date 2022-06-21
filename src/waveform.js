@@ -29,6 +29,7 @@ class Waveform{
         canvas.draggable = true;
         canvas.classList.add("audio-file");
         this.canvas = canvas;
+        this.canvas.id = "canvas-"+this.id
         this.canvasCtx = canvas.getContext("2d");
         this.audioNode = audioNode;
         this.name = audioNode.name ? audioNode.name : "Track "+this.id;
@@ -90,28 +91,45 @@ class Waveform{
         this.canvasCtx.fillStyle = 'rgb(235, 215, 215)';
         this.canvasCtx.fillRect(0,0,this.canvas.width,this.canvas.height);
         this.canvasCtx.strokeStyle = 'rgb(150, 0, 0)';
-        let one = Date.now()
-        this.canvasCtx.beginPath();       
-
-        var i = 0;
-        while(i < buffer.length){
-            let num1 = i/(sampleRate/pixelDensity);
-            let num2 = this.canvas.height/2 + bufferL[i]*100;
-            this.canvasCtx.lineTo(num1,num2)
-            this.canvasCtx.moveTo(num1,num2)
-            this.canvasCtx.stroke();
-            i += sampleRate/15;
-        }
-
-        // for(var i = 0; i < buffer.length; i += sampleRate/15){
-        //         let val = bufferL[i];
-        //         this.canvasCtx.lineTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
-        //         this.canvasCtx.moveTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
-        //         this.canvasCtx.stroke();
-        // }
-        let two = Date.now();
-        console.log(two - one)
-
+        setTimeout(()=>{
+            let one = Date.now()
+            this.canvasCtx.beginPath();      
+    
+            var i = 0
+            // const draw = ()=>{
+            //     if(i < buffer.length){
+            //         requestAnimationFrame(()=>{
+            //             let num1 = i/(sampleRate/pixelDensity);
+            //             let num2 = this.canvas.height/2 + bufferL[i]*50;
+            //             if(i == 0){
+            //                 this.canvasCtx.moveTo(num1,num2)
+            //             }
+            //             this.canvasCtx.lineTo(num1,num2)
+            //             this.canvasCtx.stroke();
+            //             i += sampleRate/10;
+            //             draw();
+            //         })
+            //     }
+            // }
+            var i = 0;
+            while(i < buffer.length){
+                let num1 = i/(sampleRate/pixelDensity);
+                let num2 = this.canvas.height/2 + bufferL[i]*50;
+                setTimeout(()=>{
+                    if(i == 0){
+                        this.canvasCtx.moveTo(num1,num2)
+                    }
+                    this.canvasCtx.lineTo(num1,num2)
+                    this.canvasCtx.stroke();
+                })
+               
+                i += sampleRate/10;
+            }
+    
+            // let two = Date.now();
+            // console.log(two - one)
+        },0)
+       
     }
     toggleSelected(){
         this.canvas.classList.toggle("selected");
@@ -131,7 +149,7 @@ class Waveform{
     // drag tracks along timeline
     static dragPosition(e){
         e.preventDefault();
-        console.log(e)
+        console.log(e.target.getBoundingClientRect().left)
         const tracksOffset = $("#timeline").getBoundingClientRect().bottom
         globals.tracks.currentDragged.forEach((item)=> {
             if(globals.tracks.currentDragged.length == 1){

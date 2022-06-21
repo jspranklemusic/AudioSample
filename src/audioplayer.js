@@ -264,34 +264,29 @@ class AudioPlayer{
     // make a source, give it a base analyser, compressor, eq, panning, and gain.
     async loadToQueue(buffer){
         const track = new Track(trackTypes.stereo, this);
+        track.showLoadingSpinner();
         const source = this.context.createBufferSource();
+        const waveform = new Waveform(source);
         source.name = this.nextFileName || "";
-        source.buffer = await this.context.decodeAudioData(buffer);
+        this.context.decodeAudioData(buffer).then(newBuffer=>{
+            track.hideLoadingSpinner();
+            source.buffer = newBuffer;
+            waveform.drawWaveform(source.buffer);
+            track.addClip(waveform);
+
+        });
         source.player = this;
         source.startTime = 0;
-        const waveform = new Waveform(source);
-        track.addClip(waveform);
-        waveform.drawWaveform(source.buffer);
+
         this.audioFiles.push(waveform);
         this.tracks.push(track);
 
     }
 
     async loadAudio(url){
-        const track = new Track(trackTypes.stereo, this);
-        this.url = url;
-        this.source = this.context.createBufferSource();
-        this.source.player = this;
-        this.source.name = this.nextFileName || "";
         this.audioBuffer = await fetch(url)
-            .then(res => res.arrayBuffer())
-            .then(ArrayBuffer => this.context.decodeAudioData(ArrayBuffer));
-        this.source.buffer = this.audioBuffer;
-        const waveform = new Waveform(this.source);
-        waveform.drawWaveform(this.source.buffer);
-        track.addClip(waveform);
-        this.audioFiles.push(waveform);
-        this.tracks.push(track);
+            .then(res => res.arrayBuffer());
+        await this.loadToQueue(this.audioBuffer);
     }
     drawTimeline(){
         let n = 0;

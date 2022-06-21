@@ -2,7 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&family=Radio+Canada:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');:root{
     --range-filled: rgb(200, 0, 0);
     --range-empty: rgb(220,210,210);
-    --above-all: 1000
+    --above-all: 1000;
+    --medium-red: rgb(150,0,0);
 }
 
 *{
@@ -457,6 +458,56 @@ input[type="checkbox"]:checked + label > .btn-checkbox.record-enable::after{
 .fadein {
     animation: fadein 0.25s backwards;
 }
+
+/* loading dots */
+
+.loading-dots {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translateY(-50%) translateX(-50%);
+    color: var(--range-filled);
+  }
+  
+  .dot {
+    animation:scaling 1s infinite;
+    -webkit-animation:scaling 1s infinite; 
+    width: 14px;
+    height: 14px;
+    background-color: var(--range-filled);
+    display:inline-block;
+    border-radius: 50% 50% 50% 50%;
+    opacity:1;
+  }
+  .dot_two {
+    -webkit-animation-delay: 0.1s;
+    animation-delay: 0.1s;
+  }
+  
+  .dot_three {
+    -webkit-animation-delay: 0.2s;
+    animation-delay: 0.2s;
+  }
+  .dot_four {
+    -webkit-animation-delay: 0.3s;
+    animation-delay: 0.3s;
+  }
+
+  /* all animations */
+      
+  @-webkit-keyframes scaling {
+      75% { 
+        -webkit-transform:  scale(0.8);
+        opacity:0.4;
+      }
+  }
+  
+  @keyframes scaling {
+      75% { 
+        transform: scale(0.8);
+        opacity:0.4;
+      }
+  }
 
 @keyframes fadein {
     0%{

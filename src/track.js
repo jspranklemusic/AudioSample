@@ -40,6 +40,20 @@ class Track {
         this.element = track;
         this.setListeners();
     }
+    showLoadingSpinner(){
+        this.spinner = document.createElement("div");
+        this.spinner.classList.add("loading-dots");
+        this.spinner.innerHTML = `
+            <div class="dot"></div>
+            <div class="dot dot_two"></div>
+            <div class="dot dot_three"></div>
+            <div class="dot dot_four"></div>
+        `
+        this.element.appendChild(this.spinner);
+    }
+    hideLoadingSpinner(){
+        this.spinner.remove();
+    }
     addClip(clip){
         this.clips.push(clip);
         this.element.appendChild(clip.element);
@@ -60,8 +74,8 @@ class Track {
         console.log("deleting...",this)
         this.clips.forEach(clip => {
             clip.deleteClip();
-            this.element.remove();
         })
+        this.element.remove();
     }
     setListeners(){
         console.log(this.element)

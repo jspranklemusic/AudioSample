@@ -4,7 +4,7 @@ export function $(selector){
 export function $$(selector){
     return document.querySelectorAll(selector);
 }
-export const allowedAudioFileTypes = ["audio/mpeg","audio/ogg"];
+export const allowedAudioFileTypes = ["audio/mpeg","audio/ogg","audio/x-wav"];
 
 export const globals = {
     tracks: {
