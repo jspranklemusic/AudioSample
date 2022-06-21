@@ -1,5 +1,5 @@
 # AudioSample
-A simple, vanilla JS in-browser DAW for editing, recording, and mixing.
+A simple, vanilla JS in-browser DAW for editing, recording, and mixing. <a href="https://audio-sample-daw.netlify.app/">A working preview can be found here.</a>
 
 <img width=350 src="https://user-images.githubusercontent.com/75324120/174328481-da56c518-84be-450d-9c1a-fb01e26df8b0.png"/>
 
@@ -12,4 +12,3 @@ Currently, the features that work are:
 2. play them back all at once
 3. remove clips from the timeline
 4. move the cursor to a position and play at that location
-
