@@ -166,6 +166,9 @@ class Waveform{
             const diffX = item.dragCurrentX - item.dragStartX;
 
             item.positionX = diffX + item.prevPositionX ;
+            if(item.positionX < 0){
+                item.positionX = 0;
+            }
             // item.canvas.style.transform = `translateX(${item.positionX}px)`;
             item.canvas.parentElement.style.transform = `translateX(${item.positionX}px) translateY(${item.positionY}px)`;
             

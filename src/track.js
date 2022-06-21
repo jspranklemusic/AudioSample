@@ -16,6 +16,7 @@ class Track {
     clips = []
     id = 0
     name = ""
+    selected = false;
     static count = 0
     static objects = []
     constructor(type, audioPlayer, container = "#tracks") {
@@ -160,6 +161,12 @@ class Track {
 
     buildMasterTrack(){
         
+    }
+    
+    toggleSelected(){
+        this.selected = !this.selected;
+        this.element.querySelector(".channel").setAttribute("selected",this.selected);
+        console.log(this.selected,this.element.querySelector(".channel"));
     }
 
     // builds nodes and effects, connects to context root node

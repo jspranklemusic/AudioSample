@@ -1,5 +1,5 @@
 import Waveform from "./waveform.js";
-import { $ } from "./globals.js";
+import { $, $$, globals } from "./globals.js";
 
 class EventManager {
     constructor(audio){
@@ -27,6 +27,50 @@ class EventManager {
         $("#eq-mid").oninput = e => audio.setMasterEQ(e,"mid");
         $("#eq-high").oninput = e => audio.setMasterEQ(e,"high");
         $("#eq-highshelf").oninput = e => audio.setMasterEQ(e,"highshelf");
+        // custom range dials
+        $$(".dial").forEach(dial => {
+            // dial.onmouseover = () => {
+            //     dial.firstElementChild.classList.add("dial-mouseover")
+            // }
+            // dial.onmouseleave = () => {
+            //     if(!globals.globalMousemoveFunctions.length){
+            //         dial.firstElementChild.classList.remove("dial-mouseover")
+            //     }
+            // }
+            dial.onmousedown = () => {
+                const style = document.createElement("style");
+                style.id = "dial-active"
+                style.innerHTML = /*css*/ `
+                * {
+                    user-select: none;
+                    cursor: grabbing !important;
+                }
+                `
+                document.head.appendChild(style);
+                globals.globalMousemoveFunctions.push({ element: dial, func: (e,element)=>{
+                    if(globals.initialMouseDown === null){
+                        globals.initialMouseDown = e.clientY
+                    }
+                    let val = (globals.initialMouseDown - e.clientY)*1;
+                    if(val > 100){
+                        val = 100
+                    }
+                    if(val < 0){
+                        val = 0;
+                    }
+                    element.style.setProperty("--p",val)
+                } })
+            }
+        })
+        document.onmousemove = e => globals.globalMousemoveFunctions.forEach(item => item.func(e,item.element));
+        document.onmouseup = ()=> {
+            globals.initialMouseDown = null
+            globals.globalMousemoveFunctions = [];
+            const dial = $("#dial-active");
+            if(dial){
+                dial.remove();
+            }
+        };
     }
 }
 

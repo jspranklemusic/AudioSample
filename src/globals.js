@@ -20,6 +20,8 @@ export const globals = {
     channelControl: {  
         width: 140
     },
+    initialMouseDown: null,
+    globalMousemoveFunctions: [],
     pixelsPerSecond: 2.99684239303,
     cursorPerAnimationFrame: 1/20.0210728931
 }
