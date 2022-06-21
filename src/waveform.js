@@ -89,14 +89,19 @@ class Waveform{
         this.canvas.width = Math.floor(buffer.length/(sampleRate/pixelDensity));
         this.canvasCtx.fillStyle = 'rgb(235, 215, 215)';
         this.canvasCtx.fillRect(0,0,this.canvas.width,this.canvas.height);
-        this.canvasCtx.fillStyle = 'rgb(150, 0, 0)';
-        for(var i = 0; i < buffer.length; i += sampleRate/10){
-            if(bufferL[i]){
+        this.canvasCtx.strokeStyle = 'rgb(150, 0, 0)';
+        let one = Date.now()
+        this.canvasCtx.beginPath();       
+
+        for(var i = 0; i < buffer.length; i += sampleRate/15){
                 let val = bufferL[i];
-                this.canvasCtx.rect(i/(sampleRate/pixelDensity),this.canvas.height/2,0.5,val*100)
-                this.canvasCtx.fill();
-            }
+                this.canvasCtx.lineTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
+                this.canvasCtx.moveTo(i/(sampleRate/pixelDensity),this.canvas.height/2 + val*100)
+                this.canvasCtx.stroke();
         }
+        let two = Date.now();
+        console.log(two - one)
+
     }
     toggleSelected(){
         this.canvas.classList.toggle("selected");
@@ -116,6 +121,7 @@ class Waveform{
     // drag tracks along timeline
     static dragPosition(e){
         e.preventDefault();
+        console.log(e)
         const tracksOffset = $("#timeline").getBoundingClientRect().bottom
         globals.tracks.currentDragged.forEach((item)=> {
             if(globals.tracks.currentDragged.length == 1){

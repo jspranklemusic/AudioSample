@@ -451,11 +451,11 @@ input[type="checkbox"]:checked + label > .btn-checkbox.record-enable::after{
 /* animation classes */
 
 .fadeout { 
-    animation: fadeout 0.5s forwards;
+    animation: fadeout 0.25s forwards;
 }
 
 .fadein {
-    animation: fadein 0.5s backwards;
+    animation: fadein 0.25s backwards;
 }
 
 @keyframes fadein {

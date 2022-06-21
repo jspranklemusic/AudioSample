@@ -64,7 +64,8 @@ class Track {
         })
     }
     setListeners(){
-        this.element.ondragover = e => Waveform.dragPosition(e);
+        console.log(this.element)
+        window.ondragover = e => Waveform.dragPosition(e);
         this.element.ondrop = e => {
             e.preventDefault();
             globals.tracks.currentDragged.forEach(item => {

@@ -263,21 +263,22 @@ class AudioPlayer{
 
     // make a source, give it a base analyser, compressor, eq, panning, and gain.
     async loadToQueue(buffer){
+        const track = new Track(trackTypes.stereo, this);
         const source = this.context.createBufferSource();
         source.name = this.nextFileName || "";
         source.buffer = await this.context.decodeAudioData(buffer);
         source.player = this;
         source.startTime = 0;
-        const track = new Track(trackTypes.stereo, this);
         const waveform = new Waveform(source);
-        waveform.drawWaveform(source.buffer);
         track.addClip(waveform);
+        waveform.drawWaveform(source.buffer);
         this.audioFiles.push(waveform);
         this.tracks.push(track);
 
     }
 
     async loadAudio(url){
+        const track = new Track(trackTypes.stereo, this);
         this.url = url;
         this.source = this.context.createBufferSource();
         this.source.player = this;
@@ -286,7 +287,6 @@ class AudioPlayer{
             .then(res => res.arrayBuffer())
             .then(ArrayBuffer => this.context.decodeAudioData(ArrayBuffer));
         this.source.buffer = this.audioBuffer;
-        const track = new Track(trackTypes.stereo, this);
         const waveform = new Waveform(this.source);
         waveform.drawWaveform(this.source.buffer);
         track.addClip(waveform);
