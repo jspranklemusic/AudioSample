@@ -118,12 +118,12 @@ class Track {
         muteBtn.onclick = () => {
             if(!muteBtn.getAttribute("muted")){
                 muteBtn.setAttribute("muted","true");
-                muteBtn.src = "/icons/volume-x.svg";
+                muteBtn.src = "/assets/icons/volume-x.svg";
                 this.mute();
 
             }else{
                 muteBtn.removeAttribute("muted");
-                muteBtn.src = "/icons/volume-2.svg";
+                muteBtn.src = "/assets/icons/volume-2.svg";
                 this.unmute();
             }
         }

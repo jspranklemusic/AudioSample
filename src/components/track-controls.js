@@ -4,7 +4,7 @@ const trackControls = (args = { id: 0, setChannelVolume:()=>{}, setChannelPannin
     <div class="audio-control-group channel">
         <b class="track-name" id="track-${args.id}-name">Track ${args.id}</b>
         <div class="mute-solo-container">
-            <img class="mute-btn" id="mute-btn-${args.id}" src="/icons/volume-2.svg"/>
+            <img class="mute-btn" id="mute-btn-${args.id}" src="/assets/icons/volume-2.svg"/>
             <input id="solo-${args.id}" type="checkbox" style="display: none;"/>
             <label for="solo-${args.id}" >
                 <span class="btn-checkbox solo">S</span>
@@ -13,7 +13,7 @@ const trackControls = (args = { id: 0, setChannelVolume:()=>{}, setChannelPannin
             <label for="record-enable-${args.id}">
                 <span class="btn-checkbox record-enable"></span>
             </label>
-            <img class="mute-btn" id="delete-track-${args.id}" src="/icons/trash-2.svg"/>
+            <img class="mute-btn" id="delete-track-${args.id}" src="/assets/icons/trash-2.svg"/>
         </div>
         <div class="gain-pan-container">
             <div class="audio-control">

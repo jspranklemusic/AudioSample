@@ -3,8 +3,9 @@ import Waveform from './waveform.js';
 import AudioPlayer from './audioplayer.js';
 import Visualizer from './visualizer.js';
 import EventManager from './event-manager.js';
+import './scss/styles.scss';
 
-const audio = new AudioPlayer('../music.mp3');
+const audio = new AudioPlayer('/assets/music.mp3');
 const visualizer = new Visualizer(audio);
 const eventManager = new EventManager(audio);
 

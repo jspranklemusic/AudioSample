@@ -267,6 +267,7 @@ class AudioPlayer{
         track.showLoadingSpinner();
         const source = this.context.createBufferSource();
         const waveform = new Waveform(source);
+        console.log(this.nextFileName)
         source.name = this.nextFileName || "";
         this.context.decodeAudioData(buffer).then(newBuffer=>{
             track.hideLoadingSpinner();
