@@ -28,7 +28,7 @@
     display: block;
     box-sizing: border-box;
     position: absolute;
-    top: 0px;
+    top: -200%;
     left: 0px;
     transform-origin: left;
 
@@ -52,6 +52,7 @@
     overflow: hidden;
     display: flex;
     justify-content: center;
+    background: rgb(235, 215, 215);
 }
 .track-wrapper::after{
     content: attr(data-name);

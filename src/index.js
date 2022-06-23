@@ -28,6 +28,7 @@ const eventManager = new EventManager(audio);
 globals.audioPlayer = audio;
 
 document.addEventListener("keydown", e => {
+
     // e.preventDefault()
     if(e.key === "Delete" || e.key === "Backspace"){
         Waveform.findSelected().forEach(object => {
@@ -35,10 +36,10 @@ document.addEventListener("keydown", e => {
         })
     }
     if(e.key == "-"){
-        Track.zoomOut()
+        e.ctrlKey ? Waveform.zoomOut() : Track.zoomOut();
     }
     if(e.key == "="){
-        Track.zoomIn()
+        e.ctrlKey ? Waveform.zoomIn() : Track.zoomIn();
     }
     if(e.key == " "){
         if(audio.playing){

@@ -236,6 +236,7 @@ class AudioPlayer{
         }else{
             this.loadingQueue.shift();
             this.nextFileName = file.name;
+            console.log(file.name)
             this.reader.readAsArrayBuffer(file);
         }
     }

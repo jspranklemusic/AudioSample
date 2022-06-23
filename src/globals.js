@@ -25,7 +25,10 @@ export const globals = {
     pixelsPerSecond: 3,
     cursorPerAnimationFrame: 20,
     zoom: 1,
-    zoomMax: 40,
+    zoomMax: 100,
     zoomMin: 0.2,
+    clipZoom: 1,
+    clipZoomMax: 5,
+    clipZoomMin: 0.5
 }
 

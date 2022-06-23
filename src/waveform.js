@@ -1,5 +1,6 @@
 import { $, $$, globals } from './globals.js'
-const CANVAS_WIDTH_MAX = 7000;
+import Track from './track.js';
+const CANVAS_WIDTH_MAX = 30000;
 class Waveform{
     positionX = 0;
     prevPositionX = 0;
@@ -20,7 +21,7 @@ class Waveform{
     static objects = []
 
     // This runs when a new clip is created
-    constructor(audioNode,canvasWidth = 1050,canvasHeight = 100){
+    constructor(audioNode,canvasWidth = 1050,canvasHeight = 500){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
@@ -99,7 +100,8 @@ class Waveform{
         const pixelDensity = 3*globals.zoomMax;
         const width =  Math.floor( buffer.length / (sampleRate/pixelDensity) );
         const height = this.canvas.height/2;
-        const pixelWidth = 1;
+        const heightMultiplier = 60*globals.clipZoomMax;
+        const pixelWidth = 2;
 
         // in FF/Safari/Chrome, the max canvas width is 32767. what to do if too high res?
         // solution - make multiple canvases.
@@ -116,8 +118,6 @@ class Waveform{
             }
             remainingWidth -= CANVAS_WIDTH_MAX;
             const canvasCtx = canvas.getContext("2d");
-            canvasCtx.fillStyle = 'rgb(235, 215, 215)';
-            canvasCtx.fillRect(0,0,CANVAS_WIDTH_MAX,canvas.height);
             canvasCtx.fillStyle = 'rgb(150, 0, 0)';
         })
 
@@ -138,7 +138,7 @@ class Waveform{
                 const j = i;
 
                 let xPos = j/(sampleRate/pixelDensity) - incOffset;
-                let yPos = bufferL[j]*60;
+                let yPos = bufferL[j]*heightMultiplier;
 
                 if(xPos >= CANVAS_WIDTH_MAX){
                     console.log(xPos, i, j, buffer.length)
@@ -149,19 +149,17 @@ class Waveform{
                     this.currCanvasContext = this.canvasElements[currCanvasIdx].getContext("2d");
                 }
                 
-                // requestAnimationFrame(()=>{
-                    this.currCanvasContext.fillRect(
-                        xPos,
-                        height,
-                        pixelWidth,
-                        yPos
-                    )
+                this.currCanvasContext.fillRect(
+                    xPos,
+                    height,
+                    pixelWidth,
+                    yPos
+                )
 
-                    if(j >= buffer.length - inc){
-                        this.setWaveZoom();
-                        console.log(" ...done rendering in " + (Date.now() - one) + "ms");
-                    }
-                // })
+                if(j >= buffer.length - inc){
+                    this.setWaveZoom();
+                    console.log(" ...done rendering in " + (Date.now() - one) + "ms");
+                }
                 i += inc;
             }    
          
@@ -170,7 +168,7 @@ class Waveform{
     setWaveZoom(){
         let width = 0;
         this.canvasElements.forEach(canvas=>{
-            canvas.style.transform = `scaleX(${globals.zoom/globals.zoomMax})`
+            canvas.style.transform = `scaleX(${globals.zoom/globals.zoomMax}) scaleY(${globals.clipZoom/globals.clipZoomMax})`
             canvas.style.left = width + "px";
             const rect = canvas.getBoundingClientRect();
             width += (rect.right - rect.left);
@@ -190,6 +188,22 @@ class Waveform{
         this.element.classList.remove("selected");
         this.selected = false;
     }
+
+    static zoomOut(){
+        if(globals.clipZoom == globals.clipZoomMin) return false;
+        globals.clipZoom = Math.floor(10*(globals.clipZoom * 0.8))/10;
+        if( globals.clipZoom < globals.clipZoomMin) globals.clipZoom = globals.clipZoomMin;
+        Track.setGlobalZoom();
+        return true;
+    }
+    static zoomIn(){
+        if(globals.clipZoom == globals.clipZoomMax) return false;
+        globals.clipZoom =  Math.floor(10*(globals.clipZoom * 1.5))/10;
+        if( globals.clipZoom > globals.clipZoomMax) globals.clipZoom = globals.clipZoomMax;
+        Track.setGlobalZoom();
+        return true;
+    }
+
 
     static findSelected(){
         return Waveform.objects.filter(object => object.selected);
