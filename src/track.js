@@ -219,6 +219,33 @@ class Track {
     unmute(){
         this.effects.muteNode.gain.value = 1
     }
+
+
+    static zoomOut(){
+        console.log(globals)
+        if(globals.zoom == globals.zoomMin) return false;
+        globals.zoom = Math.floor(10*(globals.zoom * 0.8))/10;
+        if( globals.zoom < globals.zoomMin) globals.zoom = globals.zoomMin;
+        Track.setZoom();
+        return true;
+    }
+    static zoomIn(){
+        console.log(globals)
+        if(globals.zoom == globals.zoomMax) return false;
+        globals.zoom =  Math.floor(10*(globals.zoom * 1.5))/10;
+        if( globals.zoom > globals.zoomMax) globals.zoom = globals.zoomMax;
+        Track.setZoom();
+        return true;
+    }
+
+    static setZoom(){
+        console.log(globals.zoom)
+        Track.objects.forEach(object => {
+            object.clips.forEach(clip => {
+                clip.setWaveZoom();
+            })
+        })
+    }
     
 }
 

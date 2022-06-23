@@ -1,31 +1,28 @@
 import { $, allowedAudioFileTypes, globals } from './globals.js'
 import Waveform from './waveform.js';
 import Track, { trackTypes } from './track.js';
+import Timeline from './timeline.js';
 
 class AudioPlayer{
     tracks = [];
     cursorPosition = 0;
-    timelineInterval = null
-    loadingQueue = []
-    tracks = []
+    timelineInterval = null;
+    loadingQueue = [];
+    tracks = [];
     cursorOffset = 0;
+    timeline = null;
     constructor(url) {
-        // const AudioContext = window.AudioContext || window.webkitAudioContext;
         const context = new AudioContext();
         this.context = context;
         this.context.suspend();
         this.rootNode = context.destination;
         this.reader = new FileReader();
+        this.timeline = new Timeline(this);  
         this.audioFiles = [];
         this.reader.addEventListener("load", e =>{
             console.log(e);
             this.onReaderComplete();
         })
-        // construct timeline marks
-       this.drawTimeline();
-       document.addEventListener("resize", ()=>{
-        this.drawTimeline();
-       })
 
         // analyser
             this.initializeAnalyser(context,context.destination);  
@@ -134,7 +131,7 @@ class AudioPlayer{
                 requestAnimationFrame(moveCursor)
                 const currentTime = this.context.currentTime + this.cursorOffset;
                 this.cursorPosition = currentTime;
-                $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
+                $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom)}px)`;
                 let content = (Math.floor(currentTime*100)/100+"").replace(".",":");
                 if(currentTime < 10){
                     content = "00:0"+content
@@ -272,8 +269,8 @@ class AudioPlayer{
         this.context.decodeAudioData(buffer).then(newBuffer=>{
             track.hideLoadingSpinner();
             source.buffer = newBuffer;
-            waveform.drawWaveform(source.buffer);
             track.addClip(waveform);
+            waveform.drawWaveform(source.buffer);
 
         });
         source.player = this;
@@ -293,7 +290,7 @@ class AudioPlayer{
         let n = 0;
         const timeline = $("#timeline");
         timeline.innerHTML = "";
-        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10)){
+        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10*globals.zoom)){
             const span = document.createElement("span");
             span.style =`
                 display: block;

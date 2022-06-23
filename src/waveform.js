@@ -1,4 +1,5 @@
 import { $, $$, globals } from './globals.js'
+const CANVAS_WIDTH_MAX = 32000;
 class Waveform{
     positionX = 0;
     prevPositionX = 0;
@@ -14,30 +15,25 @@ class Waveform{
     startTime = 0;
     duration = 0;
     track = null;
+    canvasElements = [];
     static count = 0;
     static objects = []
 
     // This runs when a new clip is created
-    constructor(audioNode,canvasWidth = 1050,canvasHeight = 99){
+    constructor(audioNode,canvasWidth = 1050,canvasHeight = 100){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
-        // set canvas
-        const canvas = document.createElement("canvas");
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        canvas.draggable = true;
-        canvas.classList.add("audio-file");
-        this.canvas = canvas;
-        this.canvas.id = "canvas-"+this.id
-        this.canvasCtx = canvas.getContext("2d");
+
+        // set canvas and wrapper
         this.audioNode = audioNode;
         this.name = audioNode.name ? audioNode.name : "Track "+this.id;
         this.player = this.audioNode.player;
         const wrapper = document.createElement("div");
-        wrapper.appendChild(canvas);
         wrapper.classList.add("track-wrapper");
         wrapper.setAttribute("data-name",this.name);
+        this.element = wrapper;
+        this.createBaseCanvas(canvasWidth,canvasHeight);
 
         // change the places where this is referenced, namely the select option
         const option = document.createElement("option");
@@ -58,7 +54,7 @@ class Waveform{
             return false;
         })
         // select/unselected multiple if shift, otherwise only select one
-        canvas.addEventListener("mousedown", e => {
+        this.canvas.addEventListener("mousedown", e => {
             if(!e.target.classList.contains("selected")){
                 if(e.shiftKey){
                     this.select();
@@ -74,7 +70,6 @@ class Waveform{
                 }
             }
         })
-        this.element = wrapper;
     }
 
     setName(text){
@@ -82,55 +77,107 @@ class Waveform{
         this.canvas.parentElement.setAttribute("data-name",this.name);
     }
 
-    // make a waveform graphic in canvas
-    drawWaveform(buffer){
-        const bufferL = buffer.getChannelData(0);
-        var sampleRate = 48000
-        var pixelDensity = 3;
-        this.canvas.width = Math.floor(buffer.length/(sampleRate/pixelDensity));
-        this.canvasCtx.fillStyle = 'rgb(235, 215, 215)';
-        this.canvasCtx.fillRect(0,0,this.canvas.width,this.canvas.height);
-        this.canvasCtx.strokeStyle = 'rgb(150, 0, 0)';
-        setTimeout(()=>{
-            let one = Date.now()
-            this.canvasCtx.beginPath();      
-    
-            var i = 0
-            // const draw = ()=>{
-            //     if(i < buffer.length){
-            //         requestAnimationFrame(()=>{
-            //             let num1 = i/(sampleRate/pixelDensity);
-            //             let num2 = this.canvas.height/2 + bufferL[i]*50;
-            //             if(i == 0){
-            //                 this.canvasCtx.moveTo(num1,num2)
-            //             }
-            //             this.canvasCtx.lineTo(num1,num2)
-            //             this.canvasCtx.stroke();
-            //             i += sampleRate/10;
-            //             draw();
-            //         })
-            //     }
-            // }
-            var i = 0;
-            while(i < buffer.length){
-                let num1 = i/(sampleRate/pixelDensity);
-                let num2 = this.canvas.height/2 + bufferL[i]*50;
-                setTimeout(()=>{
-                    if(i == 0){
-                        this.canvasCtx.moveTo(num1,num2)
-                    }
-                    this.canvasCtx.lineTo(num1,num2)
-                    this.canvasCtx.stroke();
-                })
-               
-                i += sampleRate/10;
-            }
-    
-            // let two = Date.now();
-            // console.log(two - one)
-        },0)
-       
+    createBaseCanvas(canvasWidth,canvasHeight){
+        const canvas = document.createElement("canvas");
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.draggable = true;
+        canvas.classList.add("audio-file");
+        canvas.id = "canvas-"+this.id+String.fromCharCode(97+this.canvasElements.length);
+        this.canvasElements.push(canvas);
+        this.canvas = canvas;
+        this.canvasCtx = canvas.getContext("2d");
+        this.element.appendChild(canvas);
     }
+
+    // make a waveform graphic in canvas
+    // make a high-resolution canvas at max zoom, and then CSS transformX to scale-in to the current zoom.
+    drawWaveform(buffer,skipAnimation){
+        const one = Date.now()
+        const bufferL = buffer.getChannelData(0);
+        const sampleRate = 48000
+        const pixelDensity = 3*globals.zoomMax;
+        const width =  Math.floor( buffer.length / (sampleRate/pixelDensity) );
+        const height = this.canvas.height/2;
+        const pixelWidth = 1;
+
+        // in FF/Safari/Chrome, the max canvas width is 32767. what to do if too high res?
+        // solution - make multiple canvases.
+      
+        for(let i = 0; i < Math.floor(width/CANVAS_WIDTH_MAX); i++){
+            this.createBaseCanvas(0,this.canvas.height);
+        }
+        let remainingWidth = width;
+        this.canvasElements.forEach(canvas =>{
+            if(remainingWidth < CANVAS_WIDTH_MAX){
+                canvas.width = remainingWidth;
+            }else{
+                canvas.width = CANVAS_WIDTH_MAX;
+            }
+            remainingWidth -= CANVAS_WIDTH_MAX;
+            const canvasCtx = canvas.getContext("2d");
+            canvasCtx.fillStyle = 'rgb(235, 215, 215)';
+            canvasCtx.fillRect(0,0,CANVAS_WIDTH_MAX,canvas.height);
+            canvasCtx.fillStyle = 'rgb(150, 0, 0)';
+        })
+
+
+
+        // this.canvas.width = width;
+        // this.canvasCtx.fillStyle = 'rgb(235, 215, 215)';
+        // this.canvasCtx.fillRect(0,0,this.canvas.width,this.canvas.height);
+        // this.canvasCtx.fillStyle = 'rgb(150, 0, 0)';
+
+            var i = 0;
+            let inc = sampleRate/1000;
+            let currCanvasIdx = 0;
+            let incOffset = 0;
+            this.currCanvasContext = this.canvasElements[currCanvasIdx].getContext("2d");
+
+            while(i < buffer.length){
+                const j = i;
+
+                let xPos = j/(sampleRate/pixelDensity) - incOffset;
+                let yPos = bufferL[j]*60;
+
+                if(xPos >= CANVAS_WIDTH_MAX){
+                    console.log(xPos, i, j, buffer.length)
+                    currCanvasIdx++;
+                    incOffset += CANVAS_WIDTH_MAX
+                    xPos = 0;
+                    console.log(this.canvasElements,currCanvasIdx);
+                    this.currCanvasContext = this.canvasElements[currCanvasIdx].getContext("2d");
+                }
+                
+                requestAnimationFrame(()=>{
+                    this.currCanvasContext.fillRect(
+                        xPos,
+                        height,
+                        pixelWidth,
+                        yPos
+                    )
+
+                    if(j >= buffer.length - inc){
+                        this.setWaveZoom();
+                        console.log(" ...done rendering in " + (Date.now() - one) + "ms");
+                    }
+                })
+                i += inc;
+            }    
+         
+    }
+
+    setWaveZoom(){
+        let width = 0;
+
+        this.canvasElements.forEach(canvas=>{
+            canvas.style.transform = `scaleX(${globals.zoom/globals.zoomMax})`
+            const rect = canvas.getBoundingClientRect();
+            width += (rect.right - rect.left);
+        })
+        this.element.style.width = width + "px";
+    }
+
     toggleSelected(){
         this.canvas.classList.toggle("selected");
         this.selected = !this.selected
@@ -143,13 +190,13 @@ class Waveform{
         this.canvas.classList.remove("selected");
         this.selected = false;
     }
+
     static findSelected(){
         return Waveform.objects.filter(object => object.selected);
     }
     // drag tracks along timeline
     static dragPosition(e){
         e.preventDefault();
-        console.log(e.target.getBoundingClientRect().left)
         const tracksOffset = $("#timeline").getBoundingClientRect().bottom
         globals.tracks.currentDragged.forEach((item)=> {
             if(globals.tracks.currentDragged.length == 1){

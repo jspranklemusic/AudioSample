@@ -5,12 +5,13 @@
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode production",
-    "start": "npx webpack serve --mode development"
+    "build": "sh ./build.sh",
+    "start": "sh ./dev.sh"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@wasm-tool/emscripten": "^1.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-minimizer-webpack-plugin": "^4.0.0",
     "mini-css-extract-plugin": "^2.6.1",

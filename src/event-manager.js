@@ -1,4 +1,5 @@
 import Waveform from "./waveform.js";
+import Track from "./track.js";
 import { $, $$, globals } from "./globals.js";
 
 class EventManager {
@@ -12,6 +13,16 @@ class EventManager {
         $("#log-gain").onclick = () => audio.log();
         $("#fadeout").onclick = () => audio.fadeout();
         $("#fileinput").onchange = e => audio.processNew(e);
+        $("#zoom-out").onclick = ()=> {
+            if(Track.zoomOut()) {
+                audio.timeline.drawTimeline();
+            }
+        };
+        $("#zoom-in").onclick = ()=> {
+           if(Track.zoomIn()){
+                audio.timeline.drawTimeline();
+           }
+        };
         // volume panning
         $("#volume").oninput = e => audio.setMasterVolume(e);
         $("#panning").oninput = e => audio.setMasterPanning(e);

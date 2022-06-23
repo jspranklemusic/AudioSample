@@ -7,7 +7,7 @@ class Visualizer {
         this.canvas.height = canvasHeight;
         this.canvasCtx = this.canvas.getContext("2d");
         this.audio = audio;
-        this.visualize();
+        // this.visualize();
     }
 
     visualize(){

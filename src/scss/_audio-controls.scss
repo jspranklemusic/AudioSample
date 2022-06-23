@@ -1,0 +1,32 @@
+/* audio controls */
+
+.track-info-controls-description{
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.track-info-controls{
+    display: flex;
+}
+
+#analyzer{
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.track-info-controls b{
+    text-align: center;
+    display: block;
+}
+
+.audio-controls{
+    display: flex;
+}
+
+.audio-control-group{
+    border: 2px solid rgb(200,200,200);
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
