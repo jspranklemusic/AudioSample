@@ -1,5 +1,5 @@
 import { $, $$, globals } from './globals.js'
-const CANVAS_WIDTH_MAX = 32000;
+const CANVAS_WIDTH_MAX = 7000;
 class Waveform{
     positionX = 0;
     prevPositionX = 0;
@@ -54,7 +54,7 @@ class Waveform{
             return false;
         })
         // select/unselected multiple if shift, otherwise only select one
-        this.canvas.addEventListener("mousedown", e => {
+        this.element.addEventListener("mousedown", e => {
             if(!e.target.classList.contains("selected")){
                 if(e.shiftKey){
                     this.select();
@@ -149,7 +149,7 @@ class Waveform{
                     this.currCanvasContext = this.canvasElements[currCanvasIdx].getContext("2d");
                 }
                 
-                requestAnimationFrame(()=>{
+                // requestAnimationFrame(()=>{
                     this.currCanvasContext.fillRect(
                         xPos,
                         height,
@@ -161,7 +161,7 @@ class Waveform{
                         this.setWaveZoom();
                         console.log(" ...done rendering in " + (Date.now() - one) + "ms");
                     }
-                })
+                // })
                 i += inc;
             }    
          
@@ -169,9 +169,9 @@ class Waveform{
 
     setWaveZoom(){
         let width = 0;
-
         this.canvasElements.forEach(canvas=>{
             canvas.style.transform = `scaleX(${globals.zoom/globals.zoomMax})`
+            canvas.style.left = width + "px";
             const rect = canvas.getBoundingClientRect();
             width += (rect.right - rect.left);
         })
@@ -183,11 +183,11 @@ class Waveform{
         this.selected = !this.selected
     }
     select(){
-        this.canvas.classList.add("selected");
+        this.element.classList.add("selected");
         this.selected = true;
     }
     unselect(){
-        this.canvas.classList.remove("selected");
+        this.element.classList.remove("selected");
         this.selected = false;
     }
 

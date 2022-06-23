@@ -28,6 +28,9 @@ class Track {
         this.id = Track.count;
         this.name = "Track " + this.id;
         this.audioPlayer = audioPlayer;
+        if(Track.count == 0){
+            Track.audioPlayer = audioPlayer;
+        }
         Track.count++;
         Track.objects.push(this);
         const track = document.createElement("div");
@@ -222,29 +225,27 @@ class Track {
 
 
     static zoomOut(){
-        console.log(globals)
         if(globals.zoom == globals.zoomMin) return false;
         globals.zoom = Math.floor(10*(globals.zoom * 0.8))/10;
         if( globals.zoom < globals.zoomMin) globals.zoom = globals.zoomMin;
-        Track.setZoom();
+        Track.setGlobalZoom();
         return true;
     }
     static zoomIn(){
-        console.log(globals)
         if(globals.zoom == globals.zoomMax) return false;
         globals.zoom =  Math.floor(10*(globals.zoom * 1.5))/10;
         if( globals.zoom > globals.zoomMax) globals.zoom = globals.zoomMax;
-        Track.setZoom();
+        Track.setGlobalZoom();
         return true;
     }
 
-    static setZoom(){
-        console.log(globals.zoom)
+    static setGlobalZoom(){
         Track.objects.forEach(object => {
             object.clips.forEach(clip => {
                 clip.setWaveZoom();
             })
         })
+        globals.audioPlayer.timeline.drawTimeline();
     }
     
 }

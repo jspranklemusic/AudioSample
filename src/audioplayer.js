@@ -121,7 +121,7 @@ class AudioPlayer{
         this.audioFiles.forEach(file => {
             if(!file.audioNode.started){
                 file.audioNode.started = true
-                file.audioNode.start(this.context.currentTime,this.cursorPosition);
+                file.audioNode.start(this.context.currentTime,this.cursorPosition/globals.zoom);
             }
         })
         globals.state.stopped = false;
@@ -251,7 +251,7 @@ class AudioPlayer{
         if(origin == "tracks" && (!e.target.classList.contains("track") && e.target.id != "tracks")){
             return;
         }
-        let newPosition = ((e.clientX - 2)/(globals.pixelsPerSecond));
+        let newPosition = ((e.clientX + 2)/(globals.pixelsPerSecond));
         this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
         $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
@@ -264,8 +264,12 @@ class AudioPlayer{
         track.showLoadingSpinner();
         const source = this.context.createBufferSource();
         const waveform = new Waveform(source);
-        console.log(this.nextFileName)
-        source.name = this.nextFileName || "";
+        console.log(this.nextFileName);
+        source.player = this;
+        source.startTime = 0;
+        this.audioFiles.push(waveform);
+        this.tracks.push(track);
+        waveform.name = this.nextFileName || "";
         this.context.decodeAudioData(buffer).then(newBuffer=>{
             track.hideLoadingSpinner();
             source.buffer = newBuffer;
@@ -273,11 +277,7 @@ class AudioPlayer{
             waveform.drawWaveform(source.buffer);
 
         });
-        source.player = this;
-        source.startTime = 0;
 
-        this.audioFiles.push(waveform);
-        this.tracks.push(track);
 
     }
 

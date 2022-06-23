@@ -15,12 +15,12 @@ class EventManager {
         $("#fileinput").onchange = e => audio.processNew(e);
         $("#zoom-out").onclick = ()=> {
             if(Track.zoomOut()) {
-                audio.timeline.drawTimeline();
+   
             }
         };
         $("#zoom-in").onclick = ()=> {
            if(Track.zoomIn()){
-                audio.timeline.drawTimeline();
+          
            }
         };
         // volume panning

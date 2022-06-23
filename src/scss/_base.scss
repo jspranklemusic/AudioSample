@@ -39,6 +39,15 @@ b {
         margin: 5px 8px;
         font-size: 1.35rem;
     }
+    button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.25rem
+    }
+    img{
+        width: 1.5rem;
+    }
 }
 
 .buttons button,.button{

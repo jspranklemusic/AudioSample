@@ -27,6 +27,11 @@
     padding: 0;
     display: block;
     box-sizing: border-box;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    transform-origin: left;
+
 }
 
 .track-wrapper:first-child{
@@ -61,7 +66,7 @@
     max-width: calc(100% - 30px);
 }
 
-#tracks canvas.selected{
+#tracks .selected{
     opacity: 0.5;
     box-shadow: 0px 0px 3px 3px rgba(164, 16, 16, 0.839);
 }
