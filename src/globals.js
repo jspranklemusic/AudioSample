@@ -24,7 +24,7 @@ export const globals = {
     globalMousemoveFunctions: [],
     pixelsPerSecond: 2.99684239303,
     cursorPerAnimationFrame: 1/20.0210728931,
-    zoom: 2,
+    zoom: 1,
     zoomMax: 40,
     zoomMin: 0.2,
 }

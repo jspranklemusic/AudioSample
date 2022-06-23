@@ -251,8 +251,8 @@ class AudioPlayer{
         if(origin == "tracks" && (!e.target.classList.contains("track") && e.target.id != "tracks")){
             return;
         }
-        let newPosition = (e.clientX - 2)/globals.pixelsPerSecond;
-        this.cursorOffset = (newPosition - this.context.currentTime);
+        let newPosition = ((e.clientX - 2)/(globals.pixelsPerSecond));
+        this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
         $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
         this.jumpToPoint();
