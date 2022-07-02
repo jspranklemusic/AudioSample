@@ -1,10 +1,10 @@
 # AudioSample
-A simple, vanilla JS in-browser DAW for editing, recording, and mixing. 
+A future vanilla JS in-browser DAW for editing, recording, and mixing. 
 
 <img width=400 src="https://user-images.githubusercontent.com/75324120/176989391-3d5f13ba-3fb1-4153-8162-ab6b78a2e8e4.png"/>
 
 ### Development
-This is a vanilla Javascript app that uses a custom Webpack config for ease of development and bundling. 
+This will be a vanilla Javascript app that uses a custom Webpack config for ease of development and bundling. 
 Before starting development, run `npm install`.
 To start a dev server, `npm run start`. To create a build for production,  `npm run build`.
 ### About
