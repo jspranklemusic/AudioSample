@@ -7,15 +7,44 @@ class Timeline {
         this.audioPlayer = audioPlayer;
         // construct timeline marks
        this.drawTimeline();
-       document.addEventListener("resize", ()=>{
-        this.drawTimeline();
-       })
     }
     drawTimeline(){
         let n = 0;
         const timeline = this.element;
         timeline.innerHTML = "";
-        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10*globals.zoom)){
+
+        const setDivisionsPerUnit = (zoom)=>{
+            if(zoom <= 0.3){
+                return 60;
+            }
+            if(zoom <= 0.4){
+                return 30;
+            }
+            if(zoom <= 0.6){
+                return 20;
+            }
+            if(zoom <= 0.8){
+                return 15;
+            }
+            // if(zoom >= 1.2){
+            //     return 8;
+            // }
+
+            return 10;
+        }
+
+        let divisionsPerUnit = 10 || setDivisionsPerUnit(globals.zoom);
+
+        const setInc = zoom => {
+            const inc = globals.pixelsPerSecond*divisionsPerUnit*zoom;
+            return inc;
+        };
+
+        const inc = setInc(globals.zoom);
+
+        let secondsDivision = 60;
+
+        for(let i = 0; i < timeline.offsetWidth; i += inc){
             const span = document.createElement("span");
             span.style =`
                 display: block;
@@ -27,9 +56,10 @@ class Timeline {
                 margin-left: -2px;
                 border-left: 1px solid rgb(200,200,200);
                 user-select: none;
-            `
+            `;
             
             timeline.appendChild(span);
+
             if(!(n%60)){
                 span.style.fontWeight = "bold";
                 span.style.borderLeft = "2px solid black"
@@ -38,9 +68,10 @@ class Timeline {
                 span.innerText = n%60+"s";
         
             }
-            n += 10;
+            n += divisionsPerUnit;
         
         }
+        this.audioPlayer.moveCursor();
     }
 }
 

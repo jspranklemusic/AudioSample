@@ -1,4 +1,4 @@
-import { $, allowedAudioFileTypes, globals } from './globals.js'
+import { $, allowedAudioFileTypes, globals} from './globals.js'
 import Waveform from './waveform.js';
 import Track, { trackTypes } from './track.js';
 import Timeline from './timeline.js';
@@ -8,9 +8,9 @@ class AudioPlayer{
     cursorPosition = 0;
     timelineInterval = null;
     loadingQueue = [];
-    tracks = [];
     cursorOffset = 0;
     timeline = null;
+
     constructor(url) {
         const context = new AudioContext();
         this.context = context;
@@ -126,20 +126,13 @@ class AudioPlayer{
         })
         globals.state.stopped = false;
         // move the cursor
-        const moveCursor = (a)=> {
+        const repeatMoveCursor = ()=> {
             if(!globals.state.stopped){
-                requestAnimationFrame(moveCursor)
-                const currentTime = this.context.currentTime + this.cursorOffset;
-                this.cursorPosition = currentTime;
-                $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom)}px)`;
-                let content = (Math.floor(currentTime*100)/100+"").replace(".",":");
-                if(currentTime < 10){
-                    content = "00:0"+content
-                }
-                $("#numbers").textContent = content;
+                requestAnimationFrame(repeatMoveCursor)
+                this.moveCursor();
             }
         }
-        requestAnimationFrame(moveCursor);
+        requestAnimationFrame(repeatMoveCursor);
         // set an interval for timeline
         this.context.resume();
         // start the context again
@@ -242,10 +235,20 @@ class AudioPlayer{
     }
     // when the reader is done, it checks for more files
     onReaderComplete(){
-        this.loadToQueue(this.reader.result);
+        this.loadToQueue(this.reader.result,this);
         if(this.loadingQueue.length > 0){
             this.processNew();
         }
+    }
+    moveCursor(){
+        const currentTime = this.context.currentTime + this.cursorOffset;
+        this.cursorPosition = currentTime;
+        $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom)}px)`;
+        let content = (Math.floor(currentTime*100)/100+"").replace(".",":");
+        if(currentTime < 10){
+            content = "00:0"+content
+        }
+        $("#numbers").textContent = content;
     }
     setCursor(e,origin){
         // the cursor offset should be the distance between context.currentTime and the new position;
@@ -261,16 +264,18 @@ class AudioPlayer{
 
     // make a source, give it a base analyser, compressor, eq, panning, and gain.
     async loadToQueue(buffer){
+        const source = this.context.createBufferSource();
+        globals.loadingFiles.push(source);
+
         const track = new Track(trackTypes.stereo, this);
         track.showLoadingSpinner();
-        const source = this.context.createBufferSource();
         const waveform = new Waveform(source);
-        console.log(this.nextFileName);
         source.player = this;
         source.startTime = 0;
         this.audioFiles.push(waveform);
         this.tracks.push(track);
         waveform.name = this.nextFileName || "";
+        
         this.context.decodeAudioData(buffer).then(newBuffer=>{
             track.hideLoadingSpinner();
             source.buffer = newBuffer;
@@ -278,45 +283,12 @@ class AudioPlayer{
             waveform.drawWaveform(source.buffer);
 
         });
-
-
     }
 
     async loadAudio(url){
         this.audioBuffer = await fetch(url)
             .then(res => res.arrayBuffer());
-        await this.loadToQueue(this.audioBuffer);
-    }
-    drawTimeline(){
-        let n = 0;
-        const timeline = $("#timeline");
-        timeline.innerHTML = "";
-        for(let i = 0; i < timeline.offsetWidth; i += (globals.pixelsPerSecond*10*globals.zoom)){
-            const span = document.createElement("span");
-            span.style =`
-                display: block;
-                position: absolute;
-                left: ${i}px;
-                font-size: 10px;
-                height: 100%;
-                padding-left: 2px;
-                margin-left: -2px;
-                border-left: 1px solid rgb(200,200,200);
-                user-select: none;
-            `
-            
-            timeline.appendChild(span);
-            if(!(n%60)){
-                span.style.fontWeight = "bold";
-                span.style.borderLeft = "2px solid black"
-                span.innerText = n/60+"m";
-            }else{
-                span.innerText = n%60+"s";
-        
-            }
-            n += 10;
-        
-        }
+        this.loadToQueue(this.audioBuffer)
     }
 }
 

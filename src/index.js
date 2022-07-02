@@ -6,6 +6,7 @@ import EventManager from './event-manager.js';
 import './scss/styles.scss';
 import Module from '../wasm/main.js';
 import Track from './track.js';
+
 const getPath = ()=>{
     if(process.env.NODE_ENV == "production"){
         globals.wasmDir = "dist/wasm/";

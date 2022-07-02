@@ -13,12 +13,14 @@ export const trackTypes = {
 }
 
 class Track {
-    clips = []
-    id = 0
-    name = ""
+    clips = [];
+    id = 0;
+    name = "";
     selected = false;
+    hueRotation = 100;
     static count = 0
     static objects = []
+    static cycledHue = 0;
     constructor(type, audioPlayer, container = "#tracks") {
         if(!trackTypes[type]){
             throw new Error("Invalid track type.");
@@ -43,6 +45,16 @@ class Track {
         });
         this.element = track;
         this.setListeners();
+        this.setColor();
+    }
+    setColor(){
+        this.hueRotation = Track.cycledHue*10;
+        Track.cycledHue += 7;
+        this.element.style.filter = `hue-rotate(${this.hueRotation}deg)`;
+        this.element.querySelectorAll(".mute-solo-container").forEach(elem=>{
+            elem.style.filter = `hue-rotate(${-this.hueRotation}deg)`;
+        })
+
     }
     showLoadingSpinner(){
         this.spinner = document.createElement("div");
@@ -66,8 +78,6 @@ class Track {
         clip.canvas.parentElement.style.left = "0px"
         clip.canvas.parentElement.style.transform = `translateX(${clip.positionX}px) translateY(${clip.positionY}px)`;
         clip.audioNode.connect(this.headNode);
-        console.log(clip,this)
-
     }
     removeClip(clip){
         const index = this.clips.findIndex(object=>object.id == clip.id);

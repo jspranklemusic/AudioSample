@@ -3,14 +3,20 @@ import Track from "./track.js";
 import { $, $$, globals } from "./globals.js";
 
 class EventManager {
+
+    timelineScrollYOffset = 0;
+    timelineScrollXOffset = 0;
+    timelineBottomPosition = 0;
+    
+
     constructor(audio){
+        this.setDefaults();
         $("#tracks").onmousedown = e => audio.setCursor(e,"tracks");
         $("#timeline").onmousedown = e => audio.setCursor(e);
         // menu
         $("#load").onclick = ()=> audio.loadNew();
         $('#start').onclick = () => audio.play();
         $('#stop').onclick = () => audio.stop();
-        $("#log-gain").onclick = () => audio.log();
         $("#fadeout").onclick = () => audio.fadeout();
         $("#fileinput").onchange = e => audio.processNew(e);
         $("#zoom-out").onclick = ()=> {
@@ -73,6 +79,10 @@ class EventManager {
                 } })
             }
         })
+        window.addEventListener("resize", ()=>{
+            audio.timeline.drawTimeline();
+            this.setDefaults();
+        });
         document.onmousemove = e => globals.globalMousemoveFunctions.forEach(item => item.func(e,item.element));
         document.onmouseup = ()=> {
             globals.initialMouseDown = null
@@ -82,7 +92,46 @@ class EventManager {
                 dial.remove();
             }
         };
+        $('#timeline-and-tracks').onwheel = e =>{
+             this.scrollHandler(e);
+        }
+        this.timelineAndTracks = $('#timeline-and-tracks');
+        this.prevDateNow = Date.now();
+        this.scrollTimeline();
+
+        $("#tracks").onscroll = e =>{
+            console.log(this.timelineTopPosition,this.timelineBottomPosition, "tracks position:")
+            $$("#tracks canvas").forEach(canvas=>{
+                const rect = canvas.getBoundingClientRect().top;
+                console.log(rect)
+                if(rect.bottom > this.timelineTopPosition | rect.top < this.timelineBottomPosition){
+                    canvas.setAttribute("hidden",true);
+                }else{
+                    canvas.removeAttribute("hidden");
+                }
+            })
+        }
+
+
     }
+    scrollHandler(e){
+        let val = Math.sqrt(Math.abs(e.wheelDeltaY))*0.75;
+        this.timelineScrollYOffset += e.wheelDeltaY > 0 ? val : -1*val;
+    }
+
+    scrollTimeline(){
+        // requestAnimationFrame(()=>{
+        //     this.timelineAndTracks.style.transform = `translateX(${this.timelineScrollXOffset}px) translateY(${this.timelineScrollYOffset}px)`;
+        //     this.scrollTimeline();
+        // })
+    }
+    setDefaults(){
+        const rect = $("#tracks").getBoundingClientRect();
+        this.timelineTopPosition = rect.top;
+        this.timelineBottomPosition = rect.bottom;
+    }
+
+    
 }
 
 export default EventManager;

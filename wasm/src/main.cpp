@@ -4,10 +4,12 @@
 #include <emscripten/val.h>
 #include <emscripten/bind.h>
 #include <vector>
+#include <chrono>
 
 using emscripten::val;
 using std::string;
 using namespace emscripten;
+using namespace std::chrono;
 
 thread_local const val document = val::global("document");
 
@@ -32,9 +34,26 @@ extern "C"{
 
 }
 
-void drawWave(string canvasID, int* buffer){
-        std::cout << buffer << "\n";
-        std::cout << "buffer \n";
+
+void drawWave(string canvasID, const val &myVal){
+     
+        std::vector<float> hello = convertJSArrayToNumberVector<float>(myVal);
+        size_t length = hello.size();
+        uint64_t ms1 = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        std::cout << ms1 << " ...milliseconds start: \n";
+        float sum = 0;
+        for(int i = 0; i < length; i++){
+            if(i == length - 1){
+                std::cout << "end of loop: " << i  << ", " << hello[i]  <<  "\n";
+            }
+            sum += hello[i];
+            sum = (sum/(i+1));
+        }
+        uint64_t ms2 = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        std::cout << ms2 << " ...milliseconds end: \n";
+        std::cout << sum << "...C++ Sum";
+        
+
         return;
         const auto document = emscripten::val::global("document");
         const auto canvas = document.call<emscripten::val, std::string>("querySelector", std::string(canvasID));
@@ -43,28 +62,25 @@ void drawWave(string canvasID, int* buffer){
         const auto width = canvas["width"].as<int>();
         const auto height = canvas["height"].as<int>();
 
-        std::cout << width << "\n";
+        // std::cout << width << "\n";
 
-        ctx.call<void>("clearRect", 0, 0, width, height);
+        // ctx.call<void>("clearRect", 0, 0, width, height);
 
-        // rect
-        ctx.set("fillStyle", "white");
-        ctx.call<void>("fillRect", 0, 0, width, height);
+        // // rect
+        // ctx.set("fillStyle", "white");
+        // ctx.call<void>("fillRect", 0, 0, width, height);
 
-        // line
-        ctx.set("strokeStyle", "black");
-        ctx.call<void>("moveTo", 0, 0);
-        ctx.call<void>("lineTo", width, height);
-        ctx.call<void>("stroke");
+        // // line
+        // ctx.set("strokeStyle", "black");
+        // ctx.call<void>("moveTo", 0, 0);
+        // ctx.call<void>("lineTo", width, height);
+        // ctx.call<void>("stroke");
 
-        for(int i = 0; i < 1000; i++){
 
-        }
-
-        // text
-        ctx.set("fillStyle", "black");
-        ctx.set("font", "bold 48px serif");
-        ctx.call<void, std::string>("fillText", "Hello World!", width / 2, height / 2);
+        // // text
+        // ctx.set("fillStyle", "black");
+        // ctx.set("font", "bold 48px serif");
+        // ctx.call<void, std::string>("fillText", "Hello World!", width / 2, height / 2);
 }
 
 
@@ -75,5 +91,5 @@ int main(){
 
 EMSCRIPTEN_BINDINGS(my_module) {
     function("lerp", &lerp);
-    function("drawWave",&drawWave, allow_raw_pointers());
+    function("drawWave",&drawWave);
 }

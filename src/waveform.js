@@ -1,6 +1,6 @@
 import { $, $$, globals } from './globals.js'
 import Track from './track.js';
-const CANVAS_WIDTH_MAX = 30000;
+const CANVAS_WIDTH_MAX = 32000;
 class Waveform{
     positionX = 0;
     prevPositionX = 0;
@@ -21,7 +21,7 @@ class Waveform{
     static objects = []
 
     // This runs when a new clip is created
-    constructor(audioNode,canvasWidth = 1050,canvasHeight = 500){
+    constructor(audioNode,canvasWidth = 1050,canvasHeight = globals.clipZoomMax*100){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
@@ -78,6 +78,10 @@ class Waveform{
         this.canvas.parentElement.setAttribute("data-name",this.name);
     }
 
+    splitClip(){
+        
+    }
+
     createBaseCanvas(canvasWidth,canvasHeight){
         const canvas = document.createElement("canvas");
         canvas.width = canvasWidth;
@@ -91,9 +95,13 @@ class Waveform{
         this.element.appendChild(canvas);
     }
 
+    setColor(hueOffset = 180){
+        this.element.style.filter = `hue-rotate(${hueOffset}deg)`;
+    }
+
     // make a waveform graphic in canvas
     // make a high-resolution canvas at max zoom, and then CSS transformX to scale-in to the current zoom.
-    drawWaveform(buffer,skipAnimation){
+    drawWaveform(buffer){
         const one = Date.now()
         const bufferL = buffer.getChannelData(0);
         const sampleRate = 48000
@@ -118,15 +126,8 @@ class Waveform{
             }
             remainingWidth -= CANVAS_WIDTH_MAX;
             const canvasCtx = canvas.getContext("2d");
-            canvasCtx.fillStyle = 'rgb(150, 0, 0)';
+            canvasCtx.fillStyle = 'rgb(175, 0, 0)';
         })
-
-
-
-        // this.canvas.width = width;
-        // this.canvasCtx.fillStyle = 'rgb(235, 215, 215)';
-        // this.canvasCtx.fillRect(0,0,this.canvas.width,this.canvas.height);
-        // this.canvasCtx.fillStyle = 'rgb(150, 0, 0)';
 
             var i = 0;
             let inc = sampleRate/1000;
@@ -136,7 +137,6 @@ class Waveform{
 
             while(i < buffer.length){
                 const j = i;
-
                 let xPos = j/(sampleRate/pixelDensity) - incOffset;
                 let yPos = bufferL[j]*heightMultiplier;
 
@@ -147,14 +147,14 @@ class Waveform{
                     xPos = 0;
                     console.log(this.canvasElements,currCanvasIdx);
                     this.currCanvasContext = this.canvasElements[currCanvasIdx].getContext("2d");
-                }
+                };
                 
                 this.currCanvasContext.fillRect(
                     xPos,
                     height,
                     pixelWidth,
                     yPos
-                )
+                );
 
                 if(j >= buffer.length - inc){
                     this.setWaveZoom();
