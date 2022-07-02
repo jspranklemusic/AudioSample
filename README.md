@@ -1,5 +1,5 @@
 # AudioSample
-A simple, vanilla JS in-browser DAW for editing, recording, and mixing. <a href="https://audio-sample-daw.netlify.app/">A working preview can be found here.</a>
+A simple, vanilla JS in-browser DAW for editing, recording, and mixing. 
 
 <img width=350 src="https://user-images.githubusercontent.com/75324120/174328481-da56c518-84be-450d-9c1a-fb01e26df8b0.png"/>
 
