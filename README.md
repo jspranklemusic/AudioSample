@@ -1,7 +1,7 @@
 # AudioSample
 A simple, vanilla JS in-browser DAW for editing, recording, and mixing. 
 
-<img width=350 src="https://user-images.githubusercontent.com/75324120/174328481-da56c518-84be-450d-9c1a-fb01e26df8b0.png"/>
+<img width=400 src="https://user-images.githubusercontent.com/75324120/176989391-3d5f13ba-3fb1-4153-8162-ab6b78a2e8e4.png"/>
 
 ### Development
 This is a vanilla Javascript app that uses a custom Webpack config for ease of development and bundling. 
