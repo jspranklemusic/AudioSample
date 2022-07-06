@@ -15,9 +15,12 @@ export const trackTypes = {
 class Track {
     clips = [];
     id = 0;
+    muted = false;
+    solo = false;
     name = "";
     selected = false;
     hueRotation = 100;
+    static soloTracks = [];
     static count = 0
     static objects = []
     static cycledHue = 0;
@@ -140,6 +143,32 @@ class Track {
                 this.unmute();
             }
         }
+        // solo button
+        const soloBtn = $(`#solo-${this.id}`);
+        soloBtn.onclick = (e)=>{
+            if(!this.solo){
+                // add to soloed if shift
+                if(e.shiftKey){
+                    Track.soloTracks.push(this.id);
+                    soloBtn.classList.add("checked");
+                }else{
+                    // unsolo the others if no shift
+                    Track.soloTracks.forEach(id=>{
+                        const solo = $(`#solo-${id}`);
+                        solo.classList.remove("checked");
+                        Track.find(id).solo = false;
+                    })
+                    Track.soloTracks = [this.id];
+                    soloBtn.classList.add("checked");
+                }
+                this.solo = true;
+            }else{
+                Track.soloTracks.splice( Track.soloTracks.indexOf(this.id),1 );
+                soloBtn.classList.remove("checked");
+                this.solo = false;
+            }
+            this.soloTracks();
+        }
         // delete button
         $(`#delete-track-${this.id}`).onclick = ()=> {
             $("#popover-root").innerHTML = popover({
@@ -175,7 +204,18 @@ class Track {
     buildMasterTrack(){
         
     }
+
+    soloTracks(){
+        Track.objects.forEach(track => {
+            if(!Track.soloTracks.includes(track.id) && Track.soloTracks.length > 0){
+                track.mute(true);
+            }else if(!track.muted){
+                track.unmute(true);
+            }
+        })
+    }
     
+
     toggleSelected(){
         this.selected = !this.selected;
         this.element.querySelector(".channel").setAttribute("selected",this.selected);
@@ -226,13 +266,22 @@ class Track {
             }
         return this.effects;
     }
-    mute(){
-        this.effects.muteNode.gain.value = 0
+    mute(forSolo = undefined){
+        this.effects.muteNode.gain.value = 0;
+        if(!forSolo){
+            this.muted = true;
+        }
     }
-    unmute(){
-        this.effects.muteNode.gain.value = 1
+    unmute(forSolo = undefined){
+        this.effects.muteNode.gain.value = 1;
+        if(!forSolo){
+            this.muted = false;
+        }
     }
 
+    static find(id){
+        return Track.objects.find(object => object.id == id);
+    }
 
     static zoomOut(){
         if(globals.zoom == globals.zoomMin) return false;

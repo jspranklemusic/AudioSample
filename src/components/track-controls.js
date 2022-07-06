@@ -5,10 +5,7 @@ const trackControls = (args = { id: 0, setChannelVolume:()=>{}, setChannelPannin
         <b class="track-name" id="track-${args.id}-name">Track ${args.id}</b>
         <div class="mute-solo-container">
             <img class="mute-btn" id="mute-btn-${args.id}" src="/assets/icons/volume-2.svg"/>
-            <input id="solo-${args.id}" type="checkbox" style="display: none;"/>
-            <label for="solo-${args.id}" >
-                <span class="btn-checkbox solo">S</span>
-            </label>
+            <button class="mute-btn" id="solo-${args.id}">S</button>
             <input id="record-enable-${args.id}"  type="checkbox" style="display: none;"/>
             <label for="record-enable-${args.id}">
                 <span class="btn-checkbox record-enable"></span>

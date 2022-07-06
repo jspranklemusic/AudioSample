@@ -101,9 +101,13 @@ input[type="checkbox"]:checked + label > .btn-checkbox{
     color: white;
     border: currentColor;
 }
-input[type="checkbox"]:checked + label > .btn-checkbox.mute{
+
+.checked{
     background: rgb(231, 208, 0);
+    color: black;
+    border-color: rgb(196, 178, 16);
 }
+
 input[type="checkbox"]:checked + label > .btn-checkbox.solo{
     background: rgb(231, 208, 0);
     color: black;
