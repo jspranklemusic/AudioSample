@@ -62,76 +62,7 @@
         <div>
             <canvas id="analyzer"></canvas>
         </div>
-        <div class="audio-controls">
-            <div class="audio-control-group">
-                <div class="audio-control">
-                    <b>Volume</b>
-                    <div class="center" id="volume-display">0.5</div>
-                    <div>
-                        <input value="0.5" min="0" max="1" step="0.01" type="range" name="volume" id="volume">
-                    </div>
-                </div>
-                <div class="audio-control">
-                    <b>Panning (L/R)</b>
-                    <div class="center" id="panning-display">0</div>
-                    <div>
-                        <input value="0" min="-1" max="1" step="0.01" type="range" name="panning" id="panning">
-                    </div>
-                </div>
-            </div>
-            <div class="audio-control-group">
-                <b>Compressor</b>
-                <ul>
-                    <li>Threshold: <span id="threshold-display">-20</span> <br> 
-                        <input value="-20" min="-100" max="0" step="1" type="range" id="compressor-threshold">
-                    </li>
-                    <li>Ratio: <span id="ratio-display">1</span><br> 
-                        <input value="1" min="1" max="20" step="0.1" type="range" id="compressor-ratio">
-                    </li>
-                    <li>Attack: <span id="attack-display">0.5</span><br> 
-                        <input value="0.5" min="0" max="1" step="0.01" type="range" id="compressor-attack">
-                    </li>
-                    <li>Release: <span id="release-display">0.5</span><br> 
-                        <input value="0.5" min="0" max="1" step="0.01" type="range" id="compressor-release">
-                    </li>
-                    <li>Knee: <span id="knee-display">30</span><br> 
-                        <input value="30" min="0" max="40" step="1" type="range" id="compressor-knee">
-                    </li>
-                </ul>
-            </div>
-            <div class="audio-control-group">
-                <b>EQ</b>
-                <ul>
-                    <li>High Shelf: <span id="highshelf-display">0</span> <br> 
-                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-highshelf">
-                    </li>
-                    <li>High: <span id="high-display">0</span> <br> 
-                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-high">
-                    </li>
-                    <li>Mid: <span id="mid-display">0</span> <br> 
-                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-mid">
-                    </li>
-                    <li>Low: <span id="low-display">0</span> <br> 
-                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-low">
-                    </li>
-                    <li>Low Shelf: <span id="lowshelf-display">0</span> <br> 
-                        <input value="0" min="-40" max="40" step="1" type="range" id="eq-lowshelf">
-                    </li>
-                </ul>
-            </div>
-            <div class="audio-control-group">
-                <b>Dial Range</b>
-                <div class="dial" data-percent="40" style="
-                --c: var(--range-filled);
-                --b: 6px;
-                --w: 36px;
-                --p: 40
-                ">
-                    <div style="--b: 6px;" class="dial-inner"></div>
-                    <input style="display:none;" type="range">
-                </div>
-            </div>
-        </div>
+     
     </div>
  
     

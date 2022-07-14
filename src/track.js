@@ -3,6 +3,7 @@ import popover from "./components/popover.js";
 import { $, $$, globals } from "./globals.js";
 import { changeRangeBg } from "./components/range.js";
 import Waveform from "./waveform.js";
+import Plugin from "./plugins/plugin.js";
 
 export const trackTypes = {
     mono: "mono",
@@ -20,6 +21,7 @@ class Track {
     name = "";
     selected = false;
     hueRotation = 100;
+    plugins = [];
     static soloTracks = [];
     static count = 0
     static objects = []
@@ -247,7 +249,21 @@ class Track {
             compressor.connect(stereoPanner)
             stereoPanner.connect(gainNode);
             gainNode.connect(muteNode);
-            muteNode.connect(audioPlayer.rootNode)
+            muteNode.connect(audioPlayer.rootNode);
+
+            console.log(muteNode);
+
+            const foo = ()=>{
+                const muteNode = new Plugin({
+                    nextNode: audioPlayer.rootNode,
+                    node: new GainNode(audioPlayer.context),
+                });
+                const gainNode = new Plugin({
+                    nextNode: muteNode.node,
+                    node: new GainNode(audioPlayer.context),
+                });
+            
+            }
         // save references to nodes as variables
             // source.tailNode = gainNode;
             this.headNode = highshelf;
@@ -277,6 +293,14 @@ class Track {
         if(!forSolo){
             this.muted = false;
         }
+    }
+
+    // this makes all of the plugins display on the UI
+    setPlugins(){
+        // get current settings
+
+        // make current settings show
+
     }
 
     static find(id){

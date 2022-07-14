@@ -84,11 +84,11 @@ class AudioPlayer{
     }
     initializeCompressor(context,node){
         const compressor = new DynamicsCompressorNode(context);
-        compressor.attack.value = $("#compressor-attack").value;
-        compressor.release.value = $("#compressor-release").value;
-        compressor.threshold.value = $("#compressor-threshold").value;
-        compressor.ratio.value = $("#compressor-ratio").value;
-        compressor.knee.value = $("#compressor-knee").value;
+        // compressor.attack.value = $("#compressor-attack").value;
+        // compressor.release.value = $("#compressor-release").value;
+        // compressor.threshold.value = $("#compressor-threshold").value;
+        // compressor.ratio.value = $("#compressor-ratio").value;
+        // compressor.knee.value = $("#compressor-knee").value;
         compressor.connect(node);
         this.compressorNode = compressor;
         this.rootNode = compressor;
