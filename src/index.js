@@ -6,6 +6,8 @@ import EventManager from './event-manager.js';
 import './scss/styles.scss';
 import Module from '../wasm/main.js';
 import Track from './track.js';
+import CustomSelect from './components/custom-select.js';
+
 
 const getPath = ()=>{
     if(process.env.NODE_ENV == "production"){
@@ -25,8 +27,9 @@ Module.onRuntimeInitialized = ()=> {
 const audio = new AudioPlayer('/assets/music.mp3');
 const visualizer = new Visualizer(audio);
 const eventManager = new EventManager(audio);
-
 globals.audioPlayer = audio;
+
+CustomSelect(".track-info-controls-description",["Master"],{id: "track-select"})
 
 document.addEventListener("keydown", e => {
 

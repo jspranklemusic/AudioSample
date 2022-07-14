@@ -1,6 +1,7 @@
 import Waveform from "./waveform.js";
 import Track from "./track.js";
 import { $, $$, globals } from "./globals.js";
+import pluginsList from "./components/plugins-list.js";
 
 class EventManager {
 
@@ -110,6 +111,13 @@ class EventManager {
                     canvas.removeAttribute("hidden");
                 }
             })
+        }
+
+        $(".add-btn").onclick = e => {
+            var foo = document.createElement("div");
+            foo.innerHTML = pluginsList(e);
+            console.log(foo.firstElementChild)
+            e.target.after(foo.firstElementChild);
         }
 
 
