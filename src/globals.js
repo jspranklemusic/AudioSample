@@ -20,6 +20,7 @@ export const globals = {
     channelControl: {  
         width: 140
     },
+    Module: {},
     loadingFiles:[],
     initialMouseDown: null,
     tasks: [],

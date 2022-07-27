@@ -7,6 +7,7 @@
     cursor: pointer;
     margin: 0 10px;
     transition: 0.1s;
+    transform-origin: center;
     &::after, &::before {
         content: "";
         height: 60%;
@@ -16,7 +17,7 @@
         left: calc(50% - 1.5px);
         top: 7px;
         border-radius: 100px;
-        transition: 0.1s;
+        transition: 0.2s;
     }
     &::before {
         transform: rotateZ(90deg);
@@ -27,6 +28,7 @@
             background: rgb(150,150,150);
         }
         border-color: rgb(150,150,150);
+        transform: scale(1.1);
     }
 }
 

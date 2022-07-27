@@ -2,7 +2,7 @@ import { $ } from './globals.js'
 
 class Visualizer {
     constructor(audio,canvasWidth = 350,canvasHeight = 200){
-        this.canvas = $('#analyzer');
+        this.canvas = $('.analyzer');
         this.canvas.width = canvasWidth;
         this.canvas.height = canvasHeight;
         this.canvasCtx = this.canvas.getContext("2d");

@@ -21,8 +21,10 @@ const getPath = ()=>{
 
 Module.onRuntimeInitialized = ()=> {
     globals.wasmLoaded = true
-    window.Module = Module;
+    globals.Module = Module;
 };
+
+window.globals = globals;
 
 const audio = new AudioPlayer('/assets/music.mp3');
 const visualizer = new Visualizer(audio);

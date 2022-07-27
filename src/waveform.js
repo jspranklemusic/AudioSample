@@ -1,5 +1,7 @@
 import { $, $$, globals } from './globals.js'
 import Track from './track.js';
+import WasmBridge from './wasm-bridge.js';
+
 const CANVAS_WIDTH_MAX = 32000;
 class Waveform{
     positionX = 0;
@@ -110,6 +112,8 @@ class Waveform{
         const height = this.canvas.height/2;
         const heightMultiplier = 60*globals.clipZoomMax;
         const pixelWidth = 2;
+        WasmBridge.addBuffer(bufferL);
+
 
         // in FF/Safari/Chrome, the max canvas width is 32767. what to do if too high res?
         // solution - make multiple canvases.

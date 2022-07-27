@@ -266,7 +266,6 @@ class AudioPlayer{
     async loadToQueue(buffer){
         const source = this.context.createBufferSource();
         globals.loadingFiles.push(source);
-
         const track = new Track(trackTypes.stereo, this);
         track.showLoadingSpinner();
         const waveform = new Waveform(source);
@@ -281,7 +280,6 @@ class AudioPlayer{
             source.buffer = newBuffer;
             track.addClip(waveform);
             waveform.drawWaveform(source.buffer);
-
         });
     }
 
