@@ -14,6 +14,9 @@ class Timeline {
         timeline.innerHTML = "";
 
         const setDivisionsPerUnit = (zoom)=>{
+            if(zoom <= 0.2){
+                return 120;
+            }
             if(zoom <= 0.3){
                 return 60;
             }
@@ -26,14 +29,18 @@ class Timeline {
             if(zoom <= 0.8){
                 return 15;
             }
-            // if(zoom >= 1.2){
-            //     return 8;
-            // }
+            if(zoom >= 10){
+                return 2;
+            }
+            if(zoom >= 2){
+                return 5;
+            }
+         
 
             return 10;
         }
 
-        let divisionsPerUnit = 10 || setDivisionsPerUnit(globals.zoom);
+        let divisionsPerUnit = setDivisionsPerUnit(globals.zoom);
 
         const setInc = zoom => {
             const inc = globals.pixelsPerSecond*divisionsPerUnit*zoom;
@@ -42,7 +49,7 @@ class Timeline {
 
         const inc = setInc(globals.zoom);
 
-        let secondsDivision = 60;
+        let graphPartition = 6*divisionsPerUnit;
 
         for(let i = 0; i < timeline.offsetWidth; i += inc){
             const span = document.createElement("span");
@@ -60,7 +67,7 @@ class Timeline {
             
             timeline.appendChild(span);
 
-            if(!(n%60)){
+            if(!(n%graphPartition)){
                 span.style.fontWeight = "bold";
                 span.style.borderLeft = "2px solid black"
                 span.innerText = n/60+"m";
@@ -84,7 +91,6 @@ class Timeline {
         let centiseconds = Math.floor((time % 1)*100) + "";
         if(centiseconds.length == 1)
             centiseconds = "0" + centiseconds;
-
         return `${minutes}:${seconds}:${centiseconds}`
     }
 }

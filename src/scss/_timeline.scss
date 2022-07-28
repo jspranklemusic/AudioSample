@@ -1,7 +1,7 @@
 /* timeline */
 
 #timeline-and-tracks{
-    overflow: scroll;
+    overflow-x: hidden;
     .popover {
         position: fixed;
         width: 4.25rem;
@@ -15,6 +15,7 @@
         z-index: 10;
         font-size: 10px;
         text-align: center;
+        display: none;
         &::after{
             content: "";
             position: absolute;
