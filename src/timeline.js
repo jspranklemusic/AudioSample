@@ -12,7 +12,6 @@ class Timeline {
         let n = 0;
         const timeline = this.element;
         timeline.innerHTML = "";
-
         const setDivisionsPerUnit = (zoom)=>{
             if(zoom <= 0.2){
                 return 120;
@@ -29,6 +28,9 @@ class Timeline {
             if(zoom <= 0.8){
                 return 15;
             }
+            if(zoom >= 25){
+                return 1;
+            }
             if(zoom >= 10){
                 return 2;
             }
@@ -36,22 +38,16 @@ class Timeline {
                 return 5;
             }
          
-
             return 10;
         }
-
         let divisionsPerUnit = setDivisionsPerUnit(globals.zoom);
-
         const setInc = zoom => {
             const inc = globals.pixelsPerSecond*divisionsPerUnit*zoom;
             return inc;
         };
-
         const inc = setInc(globals.zoom);
-
-        let graphPartition = 6*divisionsPerUnit;
-
-        for(let i = 0; i < timeline.offsetWidth; i += inc){
+        let graphPartition = 60;
+        for(let i = 0; i < timeline.offsetWidth*2; i += inc){
             const span = document.createElement("span");
             span.style =`
                 display: block;
@@ -79,6 +75,17 @@ class Timeline {
         
         }
         this.audioPlayer.moveCursor();
+    }
+
+    static secondsToPixels(seconds){
+        console.log("seconds to pixels: seconds",seconds, globals.zoom, globals.pixelsPerSecond);
+        const result = (seconds*globals.pixelsPerSecond)*globals.zoom;
+        console.log(result);
+        return result;
+    }
+
+    static pixelsToSeconds(pixels) {
+        return (pixels/globals.pixelsPerSecond)/globals.zoom
     }
 
     static formatSeconds(time) {

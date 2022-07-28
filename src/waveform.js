@@ -1,5 +1,6 @@
 import { $, $$, globals } from './globals.js'
 import Track from './track.js';
+import Timeline from './timeline.js';
 import WasmBridge from './wasm-bridge.js';
 
 const CANVAS_WIDTH_MAX = 32000;
@@ -184,6 +185,8 @@ class Waveform{
             width += (rect.right - rect.left);
         })
         this.element.style.width = width + "px";
+        console.log(this.startTime, Timeline.secondsToPixels(this.startTime));
+        // this.element.style.left = Timeline.secondsToPixels(this.startTime) + "px";
     }
 
     toggleSelected(){
@@ -240,11 +243,20 @@ class Waveform{
             if(item.positionX < 0){
                 item.positionX = 0;
             }
+            // adjust the start times of the Waveform objects
+            item.startTime = Timeline.pixelsToSeconds(item.positionX);
+
             // item.canvas.style.transform = `translateX(${item.positionX}px)`;
             item.canvas.parentElement.style.transform = `translateX(${item.positionX}px) translateY(${item.positionY}px)`;
             
         })
     }
+
+    // copies the waveform object. sets the end time of wave1 and start of wave 2 to the cursor position
+    splitClip(){
+
+    }
+
     deleteClip(){
         this.canvas.parentElement.remove();
         this.audioNode.disconnect(this.track.headNode);
@@ -253,7 +265,6 @@ class Waveform{
         }
         this.option.remove();
         this.track.removeClip(this);
-
     }
 }
 

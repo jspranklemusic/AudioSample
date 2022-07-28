@@ -93,7 +93,7 @@ class EventManager {
                 dial.remove();
             }
         };
-        $('#timeline-and-tracks').onwheel = e =>{
+        $('#timeline').onwheel = e =>{
              this.scrollHandler(e);
         }
         $('#timeline').onmousemove = e => {
@@ -142,8 +142,13 @@ class EventManager {
 
     }
     scrollHandler(e){
-        let val = Math.sqrt(Math.abs(e.wheelDeltaY))*0.75;
-        this.timelineScrollYOffset += e.wheelDeltaY > 0 ? val : -1*val;
+        let val = Math.sqrt(Math.abs(e.wheelDeltaY))*1;
+        this.timelineScrollXOffset += e.wheelDeltaY > 0 ? val : -1*val;
+        this.timelineScrollXOffset = this.timelineScrollXOffset > 0 ? 0 : this.timelineScrollXOffset;
+        $("#timeline").style.transform = `translateX(${this.timelineScrollXOffset}px)`;
+        $$(".track-guide").forEach(trackGuide=>{
+            trackGuide.style.transform = `translateX(${this.timelineScrollXOffset}px)`;
+        })
     }
 
     scrollTimeline(){

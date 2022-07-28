@@ -43,12 +43,16 @@ class Track {
         const track = document.createElement("div");
         track.classList.add("track");
         track.id = "track-"+this.id;
+        const trackGuide = document.createElement("div");
+        trackGuide.classList.add("track-guide")
         $(container).appendChild(track);
         // okay, this is where react would be nice. I will have to assign the events after the html renders
          track.innerHTML = trackControls({
             id: this.id,
         });
+        track.appendChild(trackGuide);
         this.element = track;
+        this.trackGuide = trackGuide;
         this.setListeners();
         this.setColor();
     }
@@ -77,7 +81,7 @@ class Track {
     }
     addClip(clip){
         this.clips.push(clip);
-        this.element.appendChild(clip.element);
+        this.trackGuide.appendChild(clip.element);
         clip.positionY = 0;
         clip.track = this;
         clip.canvas.parentElement.style.left = "0px"
