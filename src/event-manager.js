@@ -1,5 +1,6 @@
 import Waveform from "./waveform.js";
 import Track from "./track.js";
+import Timeline from "./timeline.js";
 import { $, $$, globals } from "./globals.js";
 import pluginsList from "./components/plugins-list.js";
 
@@ -18,7 +19,6 @@ class EventManager {
         $("#load").onclick = ()=> audio.loadNew();
         $('#start').onclick = () => audio.play();
         $('#stop').onclick = () => audio.stop();
-        $("#fadeout").onclick = () => audio.fadeout();
         $("#fileinput").onchange = e => audio.processNew(e);
         $("#zoom-out").onclick = ()=> {
             if(Track.zoomOut()) {
@@ -96,6 +96,25 @@ class EventManager {
         $('#timeline-and-tracks').onwheel = e =>{
              this.scrollHandler(e);
         }
+        $('#timeline').onmousemove = e => {
+            const popover = $('#timeline-and-tracks .popover');
+            popover.style = `
+                left: ${e.clientX}px;
+                display: block;
+            `;
+            let seconds = Math.floor(
+                (e.clientX*100/globals.pixelsPerSecond) / globals.zoom
+            )/100;
+            console.log(seconds)
+            popover.innerText =  Timeline.formatSeconds(seconds);
+
+        }
+        $('#timeline').onmouseleave = e => {
+            $('#timeline-and-tracks .popover').style = `
+                display: none;
+            `
+        }
+
         this.timelineAndTracks = $('#timeline-and-tracks');
         this.prevDateNow = Date.now();
         this.scrollTimeline();

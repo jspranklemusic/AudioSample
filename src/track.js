@@ -98,7 +98,6 @@ class Track {
         this.element.remove();
     }
     setListeners(){
-        console.log(this.element)
         window.ondragover = e => Waveform.dragPosition(e);
         this.element.ondrop = e => {
             e.preventDefault();
@@ -313,14 +312,14 @@ class Track {
 
     static zoomOut(){
         if(globals.zoom == globals.zoomMin) return false;
-        globals.zoom = Math.floor(10*(globals.zoom * 0.8))/10;
+        globals.zoom = Math.floor(100*(globals.zoom * 0.8))/100;
         if( globals.zoom < globals.zoomMin) globals.zoom = globals.zoomMin;
         Track.setGlobalZoom();
         return true;
     }
     static zoomIn(){
         if(globals.zoom == globals.zoomMax) return false;
-        globals.zoom =  Math.floor(10*(globals.zoom * 1.5))/10;
+        globals.zoom =  Math.floor(100*(globals.zoom * 1.5))/100;
         if( globals.zoom > globals.zoomMax) globals.zoom = globals.zoomMax;
         Track.setGlobalZoom();
         return true;

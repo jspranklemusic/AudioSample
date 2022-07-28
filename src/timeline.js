@@ -73,6 +73,20 @@ class Timeline {
         }
         this.audioPlayer.moveCursor();
     }
+
+    static formatSeconds(time) {
+        let minutes = (time - time % 60)/60 + "";
+        let seconds = Math.floor(time % 60) + "";
+        if(seconds.length == 1)
+            seconds = "0" + seconds;
+        if(minutes.length == 1)
+            minutes = "0" + minutes;
+        let centiseconds = Math.floor((time % 1)*100) + "";
+        if(centiseconds.length == 1)
+            centiseconds = "0" + centiseconds;
+
+        return `${minutes}:${seconds}:${centiseconds}`
+    }
 }
 
 export default Timeline;

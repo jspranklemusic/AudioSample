@@ -20,7 +20,6 @@ class AudioPlayer{
         this.timeline = new Timeline(this);  
         this.audioFiles = [];
         this.reader.addEventListener("load", e =>{
-            console.log(e);
             this.onReaderComplete();
         })
 
@@ -40,12 +39,6 @@ class AudioPlayer{
         }
     }
 
-    analyse(){
-        const dataArray = new Uint8Array(this.bufferLength);
-        this.analyser.getByteFrequencyData(dataArray);
-        dataArray.forEach(byte => console.log(byte));
-        return dataArray;
-    }
     initializeStereoPan(context,node){
         this.stereoPanner = new StereoPannerNode(context);
         this.stereoPanner.connect(node);
@@ -114,10 +107,8 @@ class AudioPlayer{
     }
     // load audio if none, play audio, set appropriate visualizations
     async play(){
-        if(this.playing) return;
-        if(!this.audioFiles.length){
-            await this.loadAudio(this.url);
-        }
+        if(this.playing || !this.audioFiles.length) 
+            return;
         this.audioFiles.forEach(file => {
             if(!file.audioNode.started){
                 file.audioNode.started = true
@@ -192,16 +183,6 @@ class AudioPlayer{
             console.log(this.compressorNode);
         }
     }
-    fadeout(){
-        var itvl = setInterval(()=>{
-            this.gainNode.gain.value -= 0.01;
-            if(this.gainNode.gain.value <= 0){
-                clearInterval(itvl);
-                this.stop();
-            }
-  
-        },10);
-    }
     fadein(){
         this.gainNode.gain.value = 0;
         var itvl = setInterval(()=>{
@@ -210,9 +191,6 @@ class AudioPlayer{
                 clearInterval(itvl);
             }
         },10);
-    }
-    log(){
-      this.analyse();
     }
     loadNew(){
         $("#fileinput").click();
@@ -223,13 +201,11 @@ class AudioPlayer{
             this.loadingQueue = [...e.target.files]
         }
         const file = this.loadingQueue[0]
-        console.log(file)
         if(!allowedAudioFileTypes.includes(file.type)){
             throw new Error("Must be a valid audio file.");
         }else{
             this.loadingQueue.shift();
             this.nextFileName = file.name;
-            console.log(file.name)
             this.reader.readAsArrayBuffer(file);
         }
     }
@@ -240,15 +216,12 @@ class AudioPlayer{
             this.processNew();
         }
     }
+    // sets the current time of the context
     moveCursor(){
         const currentTime = this.context.currentTime + this.cursorOffset;
         this.cursorPosition = currentTime;
         $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom)}px)`;
-        let content = (Math.floor(currentTime*100)/100+"").replace(".",":");
-        if(currentTime < 10){
-            content = "00:0"+content
-        }
-        $("#numbers").textContent = content;
+        $("#numbers").textContent = Timeline.formatSeconds(currentTime)
     }
     setCursor(e,origin){
         // the cursor offset should be the distance between context.currentTime and the new position;
@@ -258,6 +231,7 @@ class AudioPlayer{
         let newPosition = ((e.clientX + 2)/(globals.pixelsPerSecond));
         this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
+
         $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
         this.jumpToPoint();
     }

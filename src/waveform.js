@@ -19,6 +19,8 @@ class Waveform{
     duration = 0;
     track = null;
     canvasElements = [];
+    startTime = 0;
+    endTime = -1;
     static count = 0;
     static objects = []
 
@@ -106,13 +108,17 @@ class Waveform{
     drawWaveform(buffer){
         const one = Date.now()
         const bufferL = buffer.getChannelData(0);
-        const sampleRate = 48000
+        const sampleRate = this.audioNode.context.sampleRate
         const pixelDensity = 3*globals.zoomMax;
         const width =  Math.floor( buffer.length / (sampleRate/pixelDensity) );
         const height = this.canvas.height/2;
         const heightMultiplier = 60*globals.clipZoomMax;
         const pixelWidth = 2;
         WasmBridge.addBuffer(bufferL);
+
+        //now that we have the buffer, set the end time
+        this.endTime = Math.floor(bufferL.length*1000/this.audioNode.context.sampleRate)/1000
+        console.log(this.startTime, this.endTime)
 
 
         // in FF/Safari/Chrome, the max canvas width is 32767. what to do if too high res?
