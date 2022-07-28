@@ -90,7 +90,8 @@ class Track {
         clip.track = null;
     }
     deleteTrack(){
-        console.log("deleting...",this)
+        Track.soloTracks.splice(Track.soloTracks.indexOf(this.id),1);
+        this.soloTracks();
         this.clips.forEach(clip => {
             clip.deleteClip();
         })
@@ -145,6 +146,8 @@ class Track {
                 this.unmute();
             }
         }
+
+        
         // solo button
         const soloBtn = $(`#solo-${this.id}`);
         soloBtn.onclick = (e)=>{
@@ -207,6 +210,7 @@ class Track {
         
     }
 
+    // this works by looping through all tracks in the "solo" category
     soloTracks(){
         Track.objects.forEach(track => {
             if(!Track.soloTracks.includes(track.id) && Track.soloTracks.length > 0){
@@ -216,7 +220,7 @@ class Track {
             }
         })
     }
-    
+
 
     toggleSelected(){
         this.selected = !this.selected;
