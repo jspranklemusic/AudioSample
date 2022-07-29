@@ -111,8 +111,10 @@ class AudioPlayer{
             return;
         this.audioFiles.forEach(file => {
             if(!file.audioNode.started){
-                file.audioNode.started = true
-                file.audioNode.start(this.context.currentTime,this.cursorPosition/globals.zoom);
+                file.audioNode.started = true;
+                const newTime = (this.cursorPosition/globals.zoom) + Timeline.pixelsToSeconds(globals.timelineScrollXOffset * -1);
+                console.log(this.cursorPosition/globals.zoom, newTime)
+                file.audioNode.start(this.context.currentTime, newTime);
             }
         })
         globals.state.stopped = false;
@@ -218,9 +220,11 @@ class AudioPlayer{
     }
     // sets the current time of the context
     moveCursor(){
-        const currentTime = this.context.currentTime + this.cursorOffset;
+        const scrollSecsOffset = Timeline.pixelsToSeconds(globals.timelineScrollXOffset * -1);
+        const scrollPixOffset = Timeline.secondsToPixels(scrollSecsOffset);
+        const currentTime = this.context.currentTime + this.cursorOffset + scrollSecsOffset;
         this.cursorPosition = currentTime;
-        $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom)}px)`;
+        $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom) - scrollPixOffset}px)`;
         $("#numbers").textContent = Timeline.formatSeconds(currentTime)
     }
     setCursor(e,origin){
@@ -229,6 +233,7 @@ class AudioPlayer{
             return;
         }
         let newPosition = ((e.clientX + 2)/(globals.pixelsPerSecond));
+        // convert to positive number
         this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
         $("#cursor").style.left = "0px";

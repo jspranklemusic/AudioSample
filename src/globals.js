@@ -28,6 +28,7 @@ export const globals = {
     pixelsPerSecond: 3,
     cursorPerAnimationFrame: 20,
     zoom: 1,
+    timelineScrollXOffset: 0,
     zoomMax: 50,
     zoomMin: 0.1,
     clipZoom: 0.75,

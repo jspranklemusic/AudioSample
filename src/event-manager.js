@@ -105,7 +105,6 @@ class EventManager {
             let seconds = Math.floor(
                 (e.clientX*100/globals.pixelsPerSecond) / globals.zoom
             )/100;
-            console.log(seconds)
             popover.innerText =  Timeline.formatSeconds(seconds);
 
         }
@@ -123,7 +122,6 @@ class EventManager {
             console.log(this.timelineTopPosition,this.timelineBottomPosition, "tracks position:")
             $$("#tracks canvas").forEach(canvas=>{
                 const rect = canvas.getBoundingClientRect().top;
-                console.log(rect)
                 if(rect.bottom > this.timelineTopPosition | rect.top < this.timelineBottomPosition){
                     canvas.setAttribute("hidden",true);
                 }else{
@@ -135,7 +133,6 @@ class EventManager {
         $(".add-btn").onclick = e => {
             var foo = document.createElement("div");
             foo.innerHTML = pluginsList(e);
-            console.log(foo.firstElementChild)
             e.target.after(foo.firstElementChild);
         }
 
@@ -143,13 +140,13 @@ class EventManager {
     }
     scrollHandler(e){
         let val = Math.sqrt(Math.abs(e.wheelDeltaY))*1;
-        this.timelineScrollXOffset += e.wheelDeltaY > 0 ? val : -1*val;
-        this.timelineScrollXOffset = this.timelineScrollXOffset > 0 ? 0 : this.timelineScrollXOffset;
-        $("#timeline").style.transform = `translateX(${this.timelineScrollXOffset}px)`;
+        globals.timelineScrollXOffset += e.wheelDeltaY > 0 ? val : -1*val;
+        globals.timelineScrollXOffset = globals.timelineScrollXOffset > 0 ? 0 : globals.timelineScrollXOffset;
+        $("#timeline").style.transform = `translateX(${globals.timelineScrollXOffset}px)`;
         $$(".track-guide").forEach(trackGuide=>{
-            trackGuide.style.transform = `translateX(${this.timelineScrollXOffset}px)`;
+            trackGuide.style.transform = `translateX(${globals.timelineScrollXOffset}px)`;
         })
-        $("#cursor").style.left = `${this.timelineScrollXOffset}px`
+        $("#cursor").style.left = `${globals.timelineScrollXOffset}px`
     }
 
     scrollTimeline(){

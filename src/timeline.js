@@ -78,14 +78,12 @@ class Timeline {
     }
 
     static secondsToPixels(seconds){
-        console.log("seconds to pixels: seconds",seconds, globals.zoom, globals.pixelsPerSecond);
         const result = (seconds*globals.pixelsPerSecond)*globals.zoom;
-        console.log(result);
         return result;
     }
 
     static pixelsToSeconds(pixels) {
-        return (pixels/globals.pixelsPerSecond)/globals.zoom
+        return (pixels/globals.zoom)/globals.pixelsPerSecond
     }
 
     static formatSeconds(time) {

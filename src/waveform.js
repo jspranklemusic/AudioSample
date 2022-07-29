@@ -23,7 +23,8 @@ class Waveform{
     startTime = 0;
     endTime = -1;
     static count = 0;
-    static objects = []
+    static objects = [];
+    static pixelWidth = 1;
 
     // This runs when a new clip is created
     constructor(audioNode,canvasWidth = 1050,canvasHeight = globals.clipZoomMax*100){
@@ -114,7 +115,7 @@ class Waveform{
         const width =  Math.floor( buffer.length / (sampleRate/pixelDensity) );
         const height = this.canvas.height/2;
         const heightMultiplier = 60*globals.clipZoomMax;
-        const pixelWidth = 2;
+        const pixelWidth = Waveform.pixelWidth;
         WasmBridge.addBuffer(bufferL);
 
         //now that we have the buffer, set the end time
