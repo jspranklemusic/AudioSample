@@ -112,9 +112,9 @@ class AudioPlayer{
         this.audioFiles.forEach(file => {
             if(!file.audioNode.started){
                 file.audioNode.started = true;
-                const newTime = (this.cursorPosition/globals.zoom) + Timeline.pixelsToSeconds(globals.timelineScrollXOffset * -1);
-                console.log(this.cursorPosition/globals.zoom, newTime)
-                file.audioNode.start(this.context.currentTime, newTime);
+                // const newTime = (this.cursorPosition/globals.zoom) + Timeline.pixelsToSeconds(globals.timelineScrollXOffset * -1);
+ 
+                file.audioNode.start(this.context.currentTime, this.cursorPosition/globals.zoom);
             }
         })
         globals.state.stopped = false;
@@ -224,7 +224,9 @@ class AudioPlayer{
         const scrollPixOffset = Timeline.secondsToPixels(scrollSecsOffset);
         const currentTime = this.context.currentTime + this.cursorOffset + scrollSecsOffset;
         this.cursorPosition = currentTime;
-        $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom) - scrollPixOffset}px)`;
+        const cursorElement = $("#cursor");
+        cursorElement.style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom) - scrollPixOffset}px)`;
+        cursorElement.style.left = `${globals.timelineScrollXOffset}px`
         $("#numbers").textContent = Timeline.formatSeconds(currentTime)
     }
     setCursor(e,origin){
@@ -232,12 +234,13 @@ class AudioPlayer{
         if(origin == "tracks" && (!e.target.classList.contains("track") && e.target.id != "tracks")){
             return;
         }
-        let newPosition = ((e.clientX + 2)/(globals.pixelsPerSecond));
+        let newPosition = (((globals.timelineScrollXOffset * -1) + e.clientX - 1)/(globals.pixelsPerSecond));
         // convert to positive number
         this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
-        $("#cursor").style.left = "0px";
-        $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
+        const cursorElement = $("#cursor");
+        cursorElement.style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
+        // cursorElement.style.left = "0px";
         this.jumpToPoint();
     }
 
