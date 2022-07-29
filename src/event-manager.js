@@ -93,7 +93,7 @@ class EventManager {
                 dial.remove();
             }
         };
-        $('#timeline').onwheel = e =>{
+        $('#timeline-wrapper').onwheel = e =>{
              this.scrollHandler(e);
         }
         $('#timeline').onmousemove = e => {
@@ -149,6 +149,7 @@ class EventManager {
         $$(".track-guide").forEach(trackGuide=>{
             trackGuide.style.transform = `translateX(${this.timelineScrollXOffset}px)`;
         })
+        $("#cursor").style.left = `${this.timelineScrollXOffset}px`
     }
 
     scrollTimeline(){

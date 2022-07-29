@@ -231,7 +231,7 @@ class AudioPlayer{
         let newPosition = ((e.clientX + 2)/(globals.pixelsPerSecond));
         this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
-
+        $("#cursor").style.left = "0px";
         $("#cursor").style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
         this.jumpToPoint();
     }
