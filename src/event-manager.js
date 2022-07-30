@@ -136,6 +136,12 @@ class EventManager {
             e.target.after(foo.firstElementChild);
         }
 
+        $("#split").onmousedown = ()=> {
+            Waveform.findSelected().forEach(object => {
+                object.splitClip()
+            })
+        }
+
 
     }
     scrollHandler(e){

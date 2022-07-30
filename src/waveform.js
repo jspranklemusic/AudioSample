@@ -27,7 +27,7 @@ class Waveform{
     static pixelWidth = 1;
 
     // This runs when a new clip is created
-    constructor(audioNode,canvasWidth = 1050,canvasHeight = globals.clipZoomMax*100){
+    constructor(audioNode,isCloned=false){
         this.id = Waveform.count;
         Waveform.count++;
         Waveform.objects.push(this);
@@ -40,7 +40,7 @@ class Waveform{
         wrapper.classList.add("track-wrapper");
         wrapper.setAttribute("data-name",this.name);
         this.element = wrapper;
-        this.createBaseCanvas(canvasWidth,canvasHeight);
+        this.createBaseCanvas(0,globals.clipZoomMax*100);
 
         // change the places where this is referenced, namely the select option
         const option = document.createElement("option");
@@ -83,10 +83,6 @@ class Waveform{
     setName(text){
         this.name = text;
         this.canvas.parentElement.setAttribute("data-name",this.name);
-    }
-
-    splitClip(){
-
     }
 
     createBaseCanvas(canvasWidth,canvasHeight){
@@ -254,9 +250,22 @@ class Waveform{
         })
     }
 
+    cloneWaveform(){
+        const waveform = new Waveform(
+            this.audioNode.context.createBufferSource(),
+            true
+        );
+        this.track.addClip(waveform);
+        this.audioNode.player.audioFiles.push(waveform);
+        waveform.audioNode.buffer = this.audioNode.buffer;
+        waveform.audioNode.player = this.audioNode.player;
+        waveform.drawWaveform(waveform.audioNode.buffer);
+        return waveform;
+    }
+
     // copies the waveform object. sets the end time of wave1 and start of wave 2 to the cursor position
     splitClip(){
-
+        const waveform = this.cloneWaveform();
     }
 
     deleteClip(){
@@ -272,7 +281,7 @@ class Waveform{
 
 // global mouseup to remove '.selected' class from track
 document.addEventListener("mouseup", e => {
-    if(!e.target.classList.contains("audio-file")){
+    if(!e.target.classList.contains("audio-file") ){
         Waveform.findSelected().forEach(object => {
             object.unselect();
         })
