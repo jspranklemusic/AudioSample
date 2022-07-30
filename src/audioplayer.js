@@ -86,36 +86,61 @@ class AudioPlayer{
         this.compressorNode = compressor;
         this.rootNode = compressor;
     }
-    jumpToPoint(){
-        for(let i = 0; i < this.audioFiles.length; i++){
-            let waveform = this.audioFiles[i];
-            if(waveform.track){
-                const data = {...waveform};
-                waveform.audioNode.disconnect();
-                waveform.audioNode = this.context.createBufferSource();
-                waveform.track = data.track;
-                waveform.audioNode.buffer = data.audioNode.buffer;
-                waveform.audioNode.started = false;
-                waveform.audioNode.connect(waveform.track.headNode);
-                this.audioFiles[i] = waveform;
+    restartTrack(id,idx){
+        let index;
+        if(id != null && id > -1){
+            index = this.audioFiles.findIndex(file => file.id == id);
+            console.log(index)
+        }else if (idx != null && idx > -1){
+            index = idx;
+            console.log(index)
+        }else{
+            return null;
+        }
+        const waveform = this.audioFiles[index];
+        if(waveform.track){
+            const buffer = waveform.audioNode.buffer;
+            waveform.audioNode.disconnect();
+            waveform.audioNode = this.context.createBufferSource();
+            waveform.audioNode.buffer = buffer;
+            waveform.audioNode.started = false;
+            waveform.audioNode.player = this;
+            waveform.audioNode.connect(waveform.track.headNode);
+            this.audioFiles[index] = waveform;
+            if(this.playing){
+                this.playIndividualFile(waveform);
             }
         }
-        if(this.playing){
-            this.playing = false;
-            this.play();
+    }
+    jumpToPoint(){
+        for(let i = 0; i < this.audioFiles.length; i++){
+            this.restartTrack(null,i);
         }
     }
+
+    playIndividualFile(file){
+        if(!file.audioNode.started){
+            file.audioNode.started = true;
+            // currentSpot and startPoint are in seconds
+            let currentSpot = (this.cursorPosition/globals.zoom);
+            let startPoint = (this.context.currentTime + file.startTime) - currentSpot;
+            if(startPoint < 0){
+                startPoint = 0;
+            }
+            currentSpot -= file.startTime;
+            if(currentSpot < 0){
+                currentSpot = 0;
+            }
+            file.audioNode.start(startPoint, currentSpot);
+        }
+    }
+
     // load audio if none, play audio, set appropriate visualizations
     async play(){
         if(this.playing || !this.audioFiles.length) 
             return;
         this.audioFiles.forEach(file => {
-            if(!file.audioNode.started){
-                file.audioNode.started = true;
-                // const newTime = (this.cursorPosition/globals.zoom) + Timeline.pixelsToSeconds(globals.timelineScrollXOffset * -1);
- 
-                file.audioNode.start(this.context.currentTime, this.cursorPosition/globals.zoom);
-            }
+           this.playIndividualFile(file);
         })
         globals.state.stopped = false;
         // move the cursor

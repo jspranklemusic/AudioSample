@@ -24,7 +24,6 @@
 }
 
 #tracks canvas{
-    cursor: pointer;
     margin: 0;
     padding: 0;
     display: block;
@@ -58,6 +57,14 @@
     display: flex;
     justify-content: center;
     background: rgb(235, 215, 215);
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+    cursor: grab;
+    &:active {
+        cursor:-webkit-grabbing;
+        cursor: -moz-grabbing;
+        cursor: grabbing;
+    }
 }
 .track-wrapper::after{
     content: attr(data-name);

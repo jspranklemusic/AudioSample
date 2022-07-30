@@ -105,6 +105,7 @@ class Track {
         window.ondragover = e => Waveform.dragPosition(e);
         this.element.ondrop = e => {
             e.preventDefault();
+
             globals.tracks.currentDragged.forEach(item => {
                 if(globals.tracks.currentDragged.length == 1 && e.target.classList.contains("track")){
                     item.track.removeClip(item);
@@ -116,6 +117,8 @@ class Track {
                 item.dragCurrentX = null
                 item.prevPositionX = item.positionX;
                 item.positionY = 0;
+                item.unselect();
+                item.audioNode.player.restartTrack(item.id, null);
             })
             globals.tracks.currentDragged = [];
             $("#tracks").click();

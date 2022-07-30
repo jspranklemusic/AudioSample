@@ -53,6 +53,7 @@ class Waveform{
         // show an empty image and drag all selected clips
         wrapper.addEventListener("dragstart", e => {
             var img = new Image();
+            // this base64 image is empty - put it there so you won't see a weird ghost
             img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
             e.dataTransfer.setDragImage(img, 0, 0);
             Waveform.findSelected().forEach(object => {
@@ -76,7 +77,7 @@ class Waveform{
                     this.unselect();
                 }
             }
-        })
+        });
     }
 
     setName(text){
@@ -85,7 +86,7 @@ class Waveform{
     }
 
     splitClip(){
-        
+
     }
 
     createBaseCanvas(canvasWidth,canvasHeight){
