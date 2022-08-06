@@ -13,8 +13,8 @@ class EventManager {
 
     constructor(audio){
         this.setDefaults();
-        $("#tracks").onmousedown = e => audio.setCursor(e,"tracks");
-        $("#timeline").onmousedown = e => audio.setCursor(e);
+        $("#tracks").onmousedown = e => audio.setCursorToPoint(e,"tracks");
+        $("#timeline-wrapper").onmousedown = e => audio.setCursorToPoint(e);
         // menu
         $("#load").onclick = ()=> audio.loadNew();
         $('#start').onclick = () => audio.play();
@@ -116,7 +116,7 @@ class EventManager {
 
         this.timelineAndTracks = $('#timeline-and-tracks');
         this.prevDateNow = Date.now();
-        this.scrollTimeline();
+        Timeline.scrollTimeline();
 
         $("#tracks").onscroll = e =>{
             console.log(this.timelineTopPosition,this.timelineBottomPosition, "tracks position:")
@@ -146,21 +146,12 @@ class EventManager {
     }
     scrollHandler(e){
         let val = Math.sqrt(Math.abs(e.wheelDeltaY))*1;
-        globals.timelineScrollXOffset += e.wheelDeltaY > 0 ? val : -1*val;
+        let passedVal = e.wheelDeltaY > 0 ? val : -1*val;
+        globals.timelineScrollXOffset += passedVal
         globals.timelineScrollXOffset = globals.timelineScrollXOffset > 0 ? 0 : globals.timelineScrollXOffset;
-        $("#timeline").style.transform = `translateX(${globals.timelineScrollXOffset}px)`;
-        $$(".track-guide").forEach(trackGuide=>{
-            trackGuide.style.transform = `translateX(${globals.timelineScrollXOffset}px)`;
-        })
-        $("#cursor").style.left = `${globals.timelineScrollXOffset}px`
+        Timeline.scrollTimeline();
     }
 
-    scrollTimeline(){
-        // requestAnimationFrame(()=>{
-        //     this.timelineAndTracks.style.transform = `translateX(${this.timelineScrollXOffset}px) translateY(${this.timelineScrollYOffset}px)`;
-        //     this.scrollTimeline();
-        // })
-    }
     setDefaults(){
         const rect = $("#tracks").getBoundingClientRect();
         this.timelineTopPosition = rect.top;

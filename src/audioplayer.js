@@ -10,6 +10,7 @@ class AudioPlayer{
     loadingQueue = [];
     cursorOffset = 0;
     timeline = null;
+    controlsWidth = 135;
 
     constructor(url) {
         const context = new AudioContext();
@@ -124,14 +125,10 @@ class AudioPlayer{
             // currentSpot and startPoint are in seconds
             let currentSpot = (this.cursorPosition/globals.zoom);
             let startPoint = (this.context.currentTime + file.startTime) - currentSpot;
-            if(startPoint < 0){
-                startPoint = 0;
-            }
             currentSpot -= file.startTime;
-            if(currentSpot < 0){
-                currentSpot = 0;
-            }
-            file.audioNode.start(startPoint, currentSpot);
+            currentSpot = currentSpot < 0 ? 0 : currentSpot;
+            startPoint = startPoint < 0 ? 0 : startPoint;
+            file.audioNode.start(startPoint, currentSpot, file.endTime);
         }
     }
 
@@ -249,24 +246,30 @@ class AudioPlayer{
         const scrollPixOffset = Timeline.secondsToPixels(scrollSecsOffset);
         const currentTime = this.context.currentTime + this.cursorOffset + scrollSecsOffset;
         this.cursorPosition = currentTime;
+        const transformValue = (this.cursorPosition*globals.pixelsPerSecond*globals.zoom) - scrollPixOffset;
+        if(transformValue + globals.timelineScrollXOffset > (window.innerWidth - this.controlsWidth)){
+            globals.timelineScrollXOffset -= (window.innerWidth/2);
+            Timeline.scrollTimeline();
+            return;
+        }
         const cursorElement = $("#cursor");
-        cursorElement.style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond*globals.zoom) - scrollPixOffset}px)`;
+        cursorElement.style.transform = `translateX(${transformValue}px)`;
         cursorElement.style.left = `${globals.timelineScrollXOffset}px`
         $("#numbers").textContent = Timeline.formatSeconds(currentTime)
     }
-    setCursor(e,origin){
+
+    setCursorToPoint(e,origin){
         // the cursor offset should be the distance between context.currentTime and the new position;
         if(origin == "tracks" && (!e.target.classList.contains("track") && e.target.id != "tracks")){
             return;
         }
         let newPosition = (((globals.timelineScrollXOffset * -1) + e.clientX - 1)/(globals.pixelsPerSecond));
-        // convert to positive number
         this.cursorOffset = (newPosition/globals.zoom - this.context.currentTime);
         this.cursorPosition = newPosition < 0 ? 0 : newPosition;
         const cursorElement = $("#cursor");
         cursorElement.style.transform = `translateX(${(this.cursorPosition*globals.pixelsPerSecond)}px)`;
-        // cursorElement.style.left = "0px";
         this.jumpToPoint();
+        this.moveCursor();
     }
 
     // make a source, give it a base analyser, compressor, eq, panning, and gain.
@@ -281,7 +284,6 @@ class AudioPlayer{
         this.audioFiles.push(waveform);
         this.tracks.push(track);
         waveform.name = this.nextFileName || "";
-        
         this.context.decodeAudioData(buffer).then(newBuffer=>{
             track.hideLoadingSpinner();
             source.buffer = newBuffer;

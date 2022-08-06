@@ -183,8 +183,6 @@ class Waveform{
             width += (rect.right - rect.left);
         })
         this.element.style.width = width + "px";
-        console.log(this.startTime, Timeline.secondsToPixels(this.startTime));
-        // this.element.style.left = Timeline.secondsToPixels(this.startTime) + "px";
     }
 
     toggleSelected(){

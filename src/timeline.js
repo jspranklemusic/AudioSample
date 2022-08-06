@@ -1,4 +1,4 @@
-import { $, globals } from "./globals";
+import { $, $$, globals } from "./globals";
 
 class Timeline {
     audioPlayer = null
@@ -97,6 +97,13 @@ class Timeline {
         if(centiseconds.length == 1)
             centiseconds = "0" + centiseconds;
         return `${minutes}:${seconds}:${centiseconds}`
+    }
+    static scrollTimeline(){
+        $("#timeline").style.transform = `translateX(${globals.timelineScrollXOffset}px)`;
+        $$(".track-guide").forEach(trackGuide=>{
+            trackGuide.style.transform = `translateX(${globals.timelineScrollXOffset}px)`;
+        })
+        $("#cursor").style.left = `${globals.timelineScrollXOffset}px`
     }
 }
 
