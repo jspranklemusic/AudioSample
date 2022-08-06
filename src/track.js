@@ -4,6 +4,7 @@ import { $, $$, globals } from "./globals.js";
 import { changeRangeBg } from "./components/range.js";
 import Waveform from "./waveform.js";
 import Plugin from "./plugins/plugin.js";
+import Timeline from "./timeline.js";
 
 export const trackTypes = {
     mono: "mono",
@@ -322,6 +323,7 @@ class Track {
         globals.zoom = Math.floor(100*(globals.zoom * 0.8))/100;
         if( globals.zoom < globals.zoomMin) globals.zoom = globals.zoomMin;
         Track.setGlobalZoom();
+        Timeline.flashAutoCursor();
         return true;
     }
     static zoomIn(){
@@ -329,6 +331,7 @@ class Track {
         globals.zoom =  Math.floor(100*(globals.zoom * 1.5))/100;
         if( globals.zoom > globals.zoomMax) globals.zoom = globals.zoomMax;
         Track.setGlobalZoom();
+        Timeline.flashAutoCursor();
         return true;
     }
 

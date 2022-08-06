@@ -5,6 +5,7 @@ class Timeline {
     element = $("#timeline");
     constructor(audioPlayer){
         this.audioPlayer = audioPlayer;
+        Timeline.audioPlayer = audioPlayer;
         // construct timeline marks
        this.drawTimeline();
     }
@@ -59,6 +60,7 @@ class Timeline {
                 margin-left: -2px;
                 border-left: 1px solid rgb(200,200,200);
                 user-select: none;
+                pointer-events: none;
             `;
             
             timeline.appendChild(span);
@@ -75,6 +77,17 @@ class Timeline {
         
         }
         this.audioPlayer.moveCursor();
+    }
+
+    static flashAutoCursor() {
+        if(globals.allowAutoCursor){
+            return;
+        }
+        globals.allowAutoCursor = true;
+        Timeline.audioPlayer.moveCursor();
+        setTimeout(()=>{
+            globals.allowAutoCursor = false;
+        },200)
     }
 
     static secondsToPixels(seconds){

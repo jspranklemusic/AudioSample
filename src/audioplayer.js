@@ -10,7 +10,7 @@ class AudioPlayer{
     loadingQueue = [];
     cursorOffset = 0;
     timeline = null;
-    controlsWidth = 135;
+    controlsWidth = 140;
 
     constructor(url) {
         const context = new AudioContext();
@@ -240,6 +240,31 @@ class AudioPlayer{
             this.processNew();
         }
     }
+
+    // move cursor back and return true if out of view
+    keepCursorInView(transformValue){
+        if(!globals.allowAutoCursor){
+            return false;
+        }
+        const totalTransformOffset = transformValue + globals.timelineScrollXOffset;
+
+        // if the cursor is too far to the right
+        if(totalTransformOffset > (window.innerWidth - this.controlsWidth)){
+            globals.timelineScrollXOffset -= Math.abs(totalTransformOffset - (window.innerWidth - this.controlsWidth)) + (window.innerWidth*0.5);
+            Timeline.scrollTimeline();
+            return true;
+        }
+        // if the cursor is too far to the left
+        if(totalTransformOffset < 0){
+            globals.timelineScrollXOffset += Math.abs(totalTransformOffset) + (window.innerWidth*0.5);
+            globals.timelineScrollXOffset = globals.timelineScrollXOffset > 0 ? 0 : globals.timelineScrollXOffset;
+            Timeline.scrollTimeline();
+            return true;
+        }
+        return false
+
+    }
+
     // sets the current time of the context
     moveCursor(){
         const scrollSecsOffset = Timeline.pixelsToSeconds(globals.timelineScrollXOffset * -1);
@@ -247,15 +272,13 @@ class AudioPlayer{
         const currentTime = this.context.currentTime + this.cursorOffset + scrollSecsOffset;
         this.cursorPosition = currentTime;
         const transformValue = (this.cursorPosition*globals.pixelsPerSecond*globals.zoom) - scrollPixOffset;
-        if(transformValue + globals.timelineScrollXOffset > (window.innerWidth - this.controlsWidth)){
-            globals.timelineScrollXOffset -= (window.innerWidth/2);
-            Timeline.scrollTimeline();
+        if(this.keepCursorInView(transformValue)){
             return;
-        }
+        };
         const cursorElement = $("#cursor");
         cursorElement.style.transform = `translateX(${transformValue}px)`;
         cursorElement.style.left = `${globals.timelineScrollXOffset}px`
-        $("#numbers").textContent = Timeline.formatSeconds(currentTime)
+        $("#numbers").textContent = Timeline.formatSeconds(this.context.currentTime + this.cursorOffset)
     }
 
     setCursorToPoint(e,origin){

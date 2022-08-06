@@ -96,19 +96,10 @@ class EventManager {
         $('#timeline-wrapper').onwheel = e =>{
              this.scrollHandler(e);
         }
-        $('#timeline').onmousemove = e => {
-            const popover = $('#timeline-and-tracks .popover');
-            popover.style = `
-                left: ${e.clientX}px;
-                display: block;
-            `;
-            let seconds = Math.floor(
-                (e.clientX*100/globals.pixelsPerSecond) / globals.zoom
-            )/100;
-            popover.innerText =  Timeline.formatSeconds(seconds);
-
+        $('#timeline-wrapper').onmousemove = e => {
+            this.showCursorPopoover(e);
         }
-        $('#timeline').onmouseleave = e => {
+        $('#timeline-wrapper').onmouseleave = e => {
             $('#timeline-and-tracks .popover').style = `
                 display: none;
             `
@@ -141,15 +132,37 @@ class EventManager {
                 object.splitClip()
             })
         }
+        $("#return-cursor-to-view").onclick = ()=> {
+            this.returnCursorToView(audio);
+        }
 
 
     }
+
+    returnCursorToView(audio){
+        Timeline.flashAutoCursor();
+        audio.moveCursor();
+    }
+
+    showCursorPopoover(e){
+        const popover = $('#timeline-and-tracks .popover');
+        popover.style = `
+            left: ${e.clientX}px;
+            display: block;
+        `;
+        let seconds = Math.floor(
+            ((e.clientX - globals.timelineScrollXOffset)*100/globals.pixelsPerSecond) / globals.zoom
+        )/100;
+        popover.innerText =  Timeline.formatSeconds(seconds);
+    }
+
     scrollHandler(e){
         let val = Math.sqrt(Math.abs(e.wheelDeltaY))*1;
         let passedVal = e.wheelDeltaY > 0 ? val : -1*val;
         globals.timelineScrollXOffset += passedVal
         globals.timelineScrollXOffset = globals.timelineScrollXOffset > 0 ? 0 : globals.timelineScrollXOffset;
         Timeline.scrollTimeline();
+        this.showCursorPopoover(e);
     }
 
     setDefaults(){
