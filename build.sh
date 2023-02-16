@@ -1,3 +1,3 @@
 export NODE_ENV=production;
 sh compile.sh
-webpack --mode production;
+npx webpack --mode production;

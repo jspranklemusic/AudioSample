@@ -35,6 +35,7 @@ export const globals = {
     clipZoom: 0.75,
     clipZoomMax: 3,
     clipZoomMin: 0.2,
+    eventManager: {}
 
 }
 

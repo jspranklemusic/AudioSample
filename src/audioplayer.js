@@ -243,9 +243,7 @@ class AudioPlayer{
 
     // move cursor back and return true if out of view
     keepCursorInView(transformValue){
-        if(!globals.allowAutoCursor){
-            return false;
-        }
+
         const totalTransformOffset = transformValue + globals.timelineScrollXOffset;
 
         // if the cursor is too far to the right
@@ -253,6 +251,9 @@ class AudioPlayer{
             globals.timelineScrollXOffset -= Math.abs(totalTransformOffset - (window.innerWidth - this.controlsWidth)) + (window.innerWidth*0.5);
             Timeline.scrollTimeline();
             return true;
+        }
+        if(!globals.allowAutoCursor){
+            return false;
         }
         // if the cursor is too far to the left
         if(totalTransformOffset < 0){

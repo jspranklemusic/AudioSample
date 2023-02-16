@@ -9,9 +9,10 @@ class EventManager {
     timelineScrollYOffset = 0;
     timelineScrollXOffset = 0;
     timelineBottomPosition = 0;
-    
 
     constructor(audio){
+
+          
         this.setDefaults();
         $("#tracks").onmousedown = e => audio.setCursorToPoint(e,"tracks");
         $("#timeline-wrapper").onmousedown = e => audio.setCursorToPoint(e);

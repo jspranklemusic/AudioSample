@@ -7,6 +7,7 @@ import './scss/styles.scss';
 import Module from '../wasm/main.js';
 import Track from './track.js';
 import CustomSelect from './components/custom-select.js';
+import WasmBridge from './wasm-bridge.js';
 
 
 const getPath = ()=>{
@@ -25,11 +26,13 @@ Module.onRuntimeInitialized = ()=> {
 };
 
 window.globals = globals;
+window.WasmBridge = WasmBridge;
 
 const audio = new AudioPlayer('/assets/music.mp3');
 const visualizer = new Visualizer(audio);
-const eventManager = new EventManager(audio);
+export const eventManager = new EventManager(audio);
 globals.audioPlayer = audio;
+globals.eventManager = eventManager;
 
 CustomSelect(".track-info-controls-description",["Master"],{id: "track-select"})
 

@@ -1,7 +1,7 @@
 import { $ } from './globals.js'
 
 class Visualizer {
-    constructor(audio,canvasWidth = 350,canvasHeight = 200){
+    constructor(audio,canvasWidth = 350, canvasHeight = 200){
         this.canvas = $('.analyzer');
         this.canvas.width = canvasWidth;
         this.canvas.height = canvasHeight;
